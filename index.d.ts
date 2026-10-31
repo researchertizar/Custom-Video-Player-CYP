@@ -1,6 +1,6 @@
 /**
- * Custom YouTube Player TypeScript Definitions
- * Zero-runtime-dependency modern YouTube video player engine.
+ * Custom Video Player (CYP) TypeScript Definitions
+ * Zero-runtime-dependency modern universal video player engine for HTML5 and YouTube.
  */
 
 export type PresetId = 'glass' | 'minimal' | 'professional' | 'cyber' | 'cinema' | 'dark';

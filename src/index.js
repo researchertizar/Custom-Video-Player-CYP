@@ -1,5 +1,6 @@
 /**
- * Custom YouTube Player - Main Library Entry Point.
+ * Custom Video Player (CYP) - Main Library Entry Point.
+ * Zero-runtime-dependency universal video player engine for HTML5 and YouTube.
  */
 
 import '../styles/player.css';

@@ -1,9 +1,9 @@
-# Custom Video Player (CYP) &middot; `@researchertizar/cyp-player`
+# Custom Video Player (CYP) &middot; `@researcher-tizar/cyp-player`
 
 > A modern, zero-runtime-dependency universal video player engine and Autonomous Web Component. Plays both **native HTML5 video files** (MP4, WebM, OGG, direct streams) and **YouTube streams** with identical luxury UI, link shielding, progressive disclosure, and 6 battle-tested developer UI presets.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![NPM Version](https://img.shields.io/badge/npm-%40researchertizar%2Fcyp--player-red.svg)](https://www.npmjs.com/package/@researchertizar/cyp-player)
+[![NPM Version](https://img.shields.io/badge/npm-%40researcher--tizar%2Fcyp--player-red.svg)](https://www.npmjs.com/package/@researcher-tizar/cyp-player)
 [![Tests: 51 Passed](https://img.shields.io/badge/Tests-51%20Passed-brightgreen.svg)]()
 [![TypeScript: Included](https://img.shields.io/badge/TypeScript-Types%20Included-3178c6.svg)](index.d.ts)
 [![Bundle Size](https://img.shields.io/badge/Bundle%20Size-~24KB%20gzip-success.svg)]()
@@ -66,16 +66,16 @@ Standard HTML5 video elements look plain, inconsistent across operating systems,
 ### 1. Modern Bundlers (NPM / Vite / Next.js / Nuxt)
 
 ```bash
-npm install @researchertizar/cyp-player
+npm install @researcher-tizar/cyp-player
 # or
-yarn add @researchertizar/cyp-player
+yarn add @researcher-tizar/cyp-player
 # or
-pnpm add @researchertizar/cyp-player
+pnpm add @researcher-tizar/cyp-player
 ```
 
 ```javascript
-import { createPlayer } from '@researchertizar/cyp-player';
-import '@researchertizar/cyp-player/dist/player.css';
+import { createPlayer } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/dist/player.css';
 
 // Initialize with an MP4 video or YouTube URL
 const player = createPlayer({
@@ -92,13 +92,13 @@ No build tools required. Place in your static HTML:
 
 ```html
 <!-- Stylesheet -->
-<link rel="stylesheet" href="https://unpkg.com/@researchertizar/cyp-player/dist/player.css">
+<link rel="stylesheet" href="https://unpkg.com/@researcher-tizar/cyp-player/dist/player.css">
 
 <!-- Container -->
 <div id="my-player" style="max-width: 860px; margin: 40px auto;"></div>
 
 <!-- Library UMD Bundle -->
-<script src="https://unpkg.com/@researchertizar/cyp-player/dist/player.umd.js"></script>
+<script src="https://unpkg.com/@researcher-tizar/cyp-player/dist/player.umd.js"></script>
 <script>
   const player = CustomVideoPlayer.create({
     element: '#my-player',
@@ -113,7 +113,7 @@ No build tools required. Place in your static HTML:
 No JavaScript initialization needed! Use declarative HTML tags:
 
 ```html
-<script type="module" src="https://unpkg.com/@researchertizar/cyp-player/dist/player.es.js"></script>
+<script type="module" src="https://unpkg.com/@researcher-tizar/cyp-player/dist/player.es.js"></script>
 
 <!-- For direct HTML5 videos -->
 <custom-video-player
@@ -143,7 +143,7 @@ The player includes built-in source detection that automatically routes your med
 Direct MP4, WebM, OGG, and adaptive HLS/DASH streams are supported natively:
 
 ```javascript
-import { Player } from '@researchertizar/cyp-player';
+import { Player } from '@researcher-tizar/cyp-player';
 
 const player = new Player({
   element: '#player',
@@ -195,7 +195,7 @@ Standard YouTube players leak video URLs in several ways:
 
 ### How Link Shielding Works
 
-`@researchertizar/cyp-player` employs a multi-tiered privacy shield:
+`@researcher-tizar/cyp-player` employs a multi-tiered privacy shield:
 
 ```
 [ User Interaction ]
@@ -217,7 +217,7 @@ To completely hide video URLs from client-side DOM scrapers, encode them into **
 
 #### On Your Backend (Node.js / Express / Next.js API):
 ```javascript
-import { encodeStreamToken } from '@researchertizar/cyp-player';
+import { encodeStreamToken } from '@researcher-tizar/cyp-player';
 
 // In your API route:
 export async function getVideo(req, res) {
@@ -298,8 +298,8 @@ CYP adheres to strict UI hygiene: **no dead controls or clutter**.
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
-import { Player } from '@researchertizar/cyp-player';
-import '@researchertizar/cyp-player/dist/player.css';
+import { Player } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/dist/player.css';
 
 export function VideoPlayer({ url, preset = 'glass' }: { url: string; preset?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -330,8 +330,8 @@ export function VideoPlayer({ url, preset = 'glass' }: { url: string; preset?: s
 ```vue
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
-import { Player } from '@researchertizar/cyp-player';
-import '@researchertizar/cyp-player/dist/player.css';
+import { Player } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/dist/player.css';
 
 const props = defineProps({
   src: { type: String, required: true },

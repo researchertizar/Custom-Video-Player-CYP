@@ -1,5 +1,5 @@
 {
-  "name": "@researchertizar/cyp-player",
+  "name": "@researcher-tizar/cyp-player",
   "version": "0.1.0",
   "description": "Modern, zero-dependency universal custom video player for HTML5 and YouTube with stream link shielding, UI models, and web components.",
   "type": "module",
@@ -44,7 +44,7 @@
     "accessible",
     "media-player"
   ],
-  "author": "researchertizar",
+  "author": "researcher-tizar",
   "license": "MIT",
   "devDependencies": {
     "happy-dom": "^21.0.4",

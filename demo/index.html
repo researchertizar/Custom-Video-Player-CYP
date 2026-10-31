@@ -1344,7 +1344,7 @@
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          <span id="install-text">npm i @researchertizar/cyp-player</span>
+          <span id="install-text">npm i @researcher-tizar/cyp-player</span>
         </button>
         <a href="https://github.com/researchertizar" target="_blank" rel="noopener noreferrer" class="github-link">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -2525,8 +2525,8 @@ player.use(analyticsPlugin());</code></pre>
 
       if (activeCodeTab === 'preset') {
         code = `// 1-Line Production UI Preset (Recommended)
-import { createPlayer } from '@researchertizar/cyp-player';
-import '@researchertizar/cyp-player/dist/player.css';
+import { createPlayer } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/dist/player.css';
 
 const player = createPlayer({
   element: '#player-container',
@@ -2536,8 +2536,8 @@ const player = createPlayer({
 });`;
       } else if (activeCodeTab === 'granular') {
         code = `// Granular Custom Configuration
-import { createPlayer, resumePlugin, keyboardPlugin } from '@researchertizar/cyp-player';
-import '@researchertizar/cyp-player/dist/player.css';
+import { createPlayer, resumePlugin, keyboardPlugin } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/dist/player.css';
 
 const player = createPlayer({
   element: '#player-container',
@@ -2556,8 +2556,8 @@ const player = createPlayer({
       } else if (activeCodeTab === 'react') {
         code = `// React / Next.js Implementation
 import React, { useEffect, useRef } from 'react';
-import { createPlayer } from '@researchertizar/cyp-player';
-import '@researchertizar/cyp-player/dist/player.css';
+import { createPlayer } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/dist/player.css';
 
 export function VideoComponent() {
   const containerRef = useRef(null);
@@ -2577,8 +2577,8 @@ export function VideoComponent() {
 }`;
       } else if (activeCodeTab === 'wc') {
         code = `<!-- Autonomous Web Component -->
-<script type="module" src="https://unpkg.com/@researchertizar/cyp-player/dist/player.es.js"><\/script>
-<link rel="stylesheet" href="https://unpkg.com/@researchertizar/cyp-player/dist/player.css">
+<script type="module" src="https://unpkg.com/@researcher-tizar/cyp-player/dist/player.es.js"><\/script>
+<link rel="stylesheet" href="https://unpkg.com/@researcher-tizar/cyp-player/dist/player.css">
 
 <!-- Direct video file or YouTube stream -->
 <custom-video-player 
@@ -2603,10 +2603,10 @@ export function VideoComponent() {
     });
 
     document.getElementById('btn-copy-install').addEventListener('click', () => {
-      navigator.clipboard.writeText('npm i @researchertizar/cyp-player').then(() => {
+      navigator.clipboard.writeText('npm i @researcher-tizar/cyp-player').then(() => {
         const span = document.getElementById('install-text');
         span.textContent = 'Copied to clipboard!';
-        setTimeout(() => { span.textContent = 'npm i @researchertizar/cyp-player'; }, 1800);
+        setTimeout(() => { span.textContent = 'npm i @researcher-tizar/cyp-player'; }, 1800);
       });
     });
 
