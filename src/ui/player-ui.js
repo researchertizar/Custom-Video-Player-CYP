@@ -3,7 +3,7 @@
  * Manages DOM lifecycle, responsive layouts, smart overlay, and auto-hide timers.
  */
 
-import { createElement, escapeHtml } from '../utils/dom.js';
+import { createElement, escapeHtml, sanitizeUrl } from '../utils/dom.js';
 import { Timeline } from './timeline.js';
 import { Controls } from './controls.js';
 import { PlaybackStatus } from '../core/state.js';
@@ -524,20 +524,33 @@ export class PlayerUI {
     }
 
     let inner = '';
+    const safeUrl = sanitizeUrl(logoOptions.url);
+
     if (logoOptions.src) {
-      const w = logoOptions.width ? `style="width: ${escapeHtml(logoOptions.width)}"` : '';
-      const img = `<img src="${escapeHtml(logoOptions.src)}" alt="Logo" ${w} />`;
-      inner = logoOptions.url
-        ? `<a href="${escapeHtml(logoOptions.url)}" target="_blank" rel="noopener noreferrer">${img}</a>`
-        : img;
+      const safeSrc = sanitizeUrl(logoOptions.src);
+      if (safeSrc) {
+        const w = logoOptions.width ? `style="width: ${escapeHtml(logoOptions.width)}"` : '';
+        const img = `<img src="${escapeHtml(safeSrc)}" alt="Logo" ${w} />`;
+        inner = safeUrl
+          ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">${img}</a>`
+          : img;
+      }
     } else if (logoOptions.innerHTML) {
-      inner = logoOptions.url
-        ? `<a href="${escapeHtml(logoOptions.url)}" target="_blank" rel="noopener noreferrer">${logoOptions.innerHTML}</a>`
-        : logoOptions.innerHTML;
+      const rawHtml = String(logoOptions.innerHTML);
+      // Reject dangerous inline script tags or event handlers
+      if (!/<script|javascript:|on\w+=/i.test(rawHtml)) {
+        inner = safeUrl
+          ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">${rawHtml}</a>`
+          : rawHtml;
+      }
     }
 
     this.logoOverlay.innerHTML = inner;
-    this.logoOverlay.classList.remove('is-hidden');
+    if (inner) {
+      this.logoOverlay.classList.remove('is-hidden');
+    } else {
+      this.logoOverlay.classList.add('is-hidden');
+    }
   }
 
   /**
@@ -545,8 +558,9 @@ export class PlayerUI {
    * @param {string} url
    */
   setPoster(url) {
-    if (this.posterImg && url) {
-      this.posterImg.src = url;
+    const safe = sanitizeUrl(url);
+    if (this.posterImg && safe) {
+      this.posterImg.src = safe;
     }
   }
 

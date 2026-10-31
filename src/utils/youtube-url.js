@@ -7,10 +7,11 @@ const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 /**
  * Extracts a YouTube video ID and optional start time from a URL or video ID string.
  * @param {string} input - URL or video ID.
+ * @param {number} [depth=0] - Recursion guard for obfuscated tokens.
  * @returns {{ videoId: string|null, startTime: number }}
  */
-export function parseYouTubeUrl(input) {
-  if (!input || typeof input !== 'string') {
+export function parseYouTubeUrl(input, depth = 0) {
+  if (!input || typeof input !== 'string' || depth > 5) {
     return { videoId: null, startTime: 0 };
   }
 
@@ -23,7 +24,7 @@ export function parseYouTubeUrl(input) {
       const decoded = typeof atob === 'function'
         ? atob(payload)
         : Buffer.from(payload, 'base64').toString('utf8');
-      return parseYouTubeUrl(decoded);
+      return parseYouTubeUrl(decoded, depth + 1);
     } catch {
       return { videoId: null, startTime: 0 };
     }

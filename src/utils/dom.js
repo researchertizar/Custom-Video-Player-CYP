@@ -71,3 +71,45 @@ export function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+/**
+ * Sanitizes URLs to prevent javascript: or data: XSS injection.
+ * Only allows safe protocols (http, https, blob, data:image) and relative URLs.
+ * @param {string} url
+ * @returns {string} Safe URL string or empty string if unsafe.
+ */
+export function sanitizeUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+
+  // Strip control characters
+  const clean = trimmed.replace(/[\x00-\x1f\x7f-\x9f]/g, '');
+
+  // Check against dangerous protocols
+  const lower = clean.toLowerCase();
+  if (
+    lower.startsWith('javascript:') ||
+    lower.startsWith('vbscript:') ||
+    lower.startsWith('data:text/html') ||
+    lower.startsWith('data:application/')
+  ) {
+    return '';
+  }
+
+  // Safe schemes and relative paths
+  if (
+    lower.startsWith('https://') ||
+    lower.startsWith('http://') ||
+    lower.startsWith('blob:') ||
+    lower.startsWith('data:image/') ||
+    clean.startsWith('/') ||
+    clean.startsWith('./') ||
+    clean.startsWith('../') ||
+    clean.startsWith('#')
+  ) {
+    return clean;
+  }
+
+  return '';
+}
+
+
