@@ -46,6 +46,14 @@
   ],
   "author": "researcher-tizar",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/researchertizar/Custom-Video-Player-CYP.git"
+  },
+  "homepage": "https://researchertizar.github.io/Custom-Video-Player-CYP/",
+  "bugs": {
+    "url": "https://github.com/researchertizar/Custom-Video-Player-CYP/issues"
+  },
   "devDependencies": {
     "happy-dom": "^21.0.4",
     "vite": "^6.2.0",
