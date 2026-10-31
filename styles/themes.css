@@ -1,0 +1,251 @@
+/* ==========================================================================
+   Custom YouTube Player - Theming Profiles & UI Design Models
+   Clean, standard, professional aesthetic models:
+   - Classic Dark (Standard default with signature red accent)
+   - Glassmorphism (Crystal frosted translucent dock)
+   - Modern Minimalist (Distraction-free floating monochrome pill)
+   - Professional Studio (Broadcast production charcoal & amber tally)
+   - Cyber Advanced (Futuristic sharp HUD)
+   - Cinema OLED Gold (Pitch black canvas with champagne gold)
+   - Clean Light (High-contrast day mode)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Classic Dark Theme (Default)
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-dark {
+  --cyp-accent: #e50914;
+  --cyp-accent-hover: #b91c1c;
+  --cyp-bg: #000000;
+  --cyp-surface: rgba(18, 18, 20, 0.96);
+  --cyp-text: #ffffff;
+  --cyp-text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* --------------------------------------------------------------------------
+   2. Glassmorphism / Frost Model
+   Crystal frosted translucent dock with high blur and refined glass borders
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-glass {
+  --cyp-accent: #38bdf8;
+  --cyp-accent-hover: #0ea5e9;
+  --cyp-bg: #050507;
+  --cyp-surface: rgba(24, 24, 28, 0.75);
+  --cyp-text: #ffffff;
+  --cyp-text-secondary: rgba(255, 255, 255, 0.75);
+  --cyp-radius: 16px;
+}
+
+.cyp-player.theme-glass .cyp-controls-bottom {
+  background: rgba(18, 18, 22, 0.68);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  margin: 0 16px 14px;
+  padding: 12px 16px 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.cyp-player.theme-glass .cyp-timeline-played {
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.45);
+}
+
+.cyp-player.theme-glass .cyp-settings-menu {
+  background: rgba(20, 20, 24, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   3. Modern Minimalist Model
+   Distraction-free, floating pill dock, pure monochrome white accent, clean line
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-minimal {
+  --cyp-accent: #ffffff;
+  --cyp-accent-hover: #e4e4e7;
+  --cyp-bg: #09090b;
+  --cyp-surface: rgba(18, 18, 20, 0.92);
+  --cyp-text: #ffffff;
+  --cyp-text-secondary: rgba(255, 255, 255, 0.65);
+  --cyp-radius: 24px;
+}
+
+.cyp-player.theme-minimal .cyp-controls-bottom {
+  background: rgba(14, 14, 16, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  margin: 0 auto 16px;
+  width: calc(100% - 36px);
+  padding: 8px 18px 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+}
+
+.cyp-player.theme-minimal .cyp-timeline-track {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.cyp-player.theme-minimal .cyp-timeline-played {
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+}
+
+.cyp-player.theme-minimal .cyp-settings-menu {
+  background: rgba(14, 14, 16, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   4. Professional Broadcast Studio Model
+   Workstation look: dark neutral charcoal matte, amber studio tally, monospace timecode
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-professional,
+.cyp-player.theme-studio {
+  --cyp-accent: #f59e0b;
+  --cyp-accent-hover: #fbbf24;
+  --cyp-bg: #09090b;
+  --cyp-surface: rgba(20, 20, 24, 0.98);
+  --cyp-text: #f4f4f5;
+  --cyp-text-secondary: #a1a1aa;
+  --cyp-radius: 6px;
+}
+
+.cyp-player.theme-professional .cyp-controls-bottom,
+.cyp-player.theme-studio .cyp-controls-bottom {
+  background: linear-gradient(180deg, rgba(20, 20, 24, 0.92) 0%, rgba(12, 12, 14, 0.98) 100%);
+  border-top: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.45);
+  padding: 10px 16px 8px;
+}
+
+.cyp-player.theme-professional .cyp-time-display,
+.cyp-player.theme-studio .cyp-time-display {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  color: #f59e0b;
+}
+
+.cyp-player.theme-professional .cyp-settings-menu,
+.cyp-player.theme-studio .cyp-settings-menu {
+  background: rgba(18, 18, 22, 0.96);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   5. Cyber Advanced HUD Model
+   Futuristic cyber aesthetic: sharp lines, neon cyan glow, tech HUD accents
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-cyber {
+  --cyp-accent: #00ffcc;
+  --cyp-accent-hover: #33ffdd;
+  --cyp-bg: #050508;
+  --cyp-surface: rgba(14, 14, 20, 0.96);
+  --cyp-text: #e6ffff;
+  --cyp-text-secondary: rgba(0, 255, 204, 0.65);
+  --cyp-radius: 2px;
+}
+
+.cyp-player.theme-cyber .cyp-controls-bottom {
+  background: rgba(10, 10, 14, 0.92);
+  border-top: 1px solid rgba(0, 255, 204, 0.4);
+  box-shadow: 0 -4px 20px rgba(0, 255, 204, 0.18);
+  padding: 10px 16px 8px;
+}
+
+.cyp-player.theme-cyber .cyp-timeline-played {
+  background: #00ffcc;
+  box-shadow: 0 0 10px #00ffcc, 0 0 20px rgba(0, 255, 204, 0.35);
+}
+
+.cyp-player.theme-cyber .cyp-btn.is-active,
+.cyp-player.theme-cyber .cyp-captions-btn.is-active {
+  color: #00ffcc;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+}
+
+.cyp-player.theme-cyber .cyp-settings-menu {
+  background: rgba(12, 12, 16, 0.96);
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  border-radius: 4px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 204, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   6. Cinema OLED Gold Model
+   Pure pitch black with warm champagne gold accent and cinematic softness
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-cinema {
+  --cyp-accent: #d4af37;
+  --cyp-accent-hover: #f3e5ab;
+  --cyp-bg: #000000;
+  --cyp-surface: rgba(14, 14, 14, 0.98);
+  --cyp-text: #f5f5f5;
+  --cyp-text-secondary: rgba(245, 245, 245, 0.65);
+  --cyp-radius: 8px;
+}
+
+.cyp-player.theme-cinema .cyp-controls-bottom {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.5) 60%, transparent);
+  padding: 44px 16px 12px;
+}
+
+.cyp-player.theme-cinema .cyp-timeline-played {
+  background: #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   7. Clean Light Theme
+   -------------------------------------------------------------------------- */
+.cyp-player.theme-light {
+  --cyp-accent: #e50914;
+  --cyp-accent-hover: #ff2233;
+  --cyp-bg: #f8f9fa;
+  --cyp-surface: rgba(255, 255, 255, 0.96);
+  --cyp-text: #18181b;
+  --cyp-text-secondary: rgba(0, 0, 0, 0.65);
+}
+
+.cyp-player.theme-light .cyp-controls-bottom {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.4) 60%, transparent);
+}
+
+.cyp-player.theme-light .cyp-btn {
+  color: #18181b;
+}
+
+.cyp-player.theme-light .cyp-time-display {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.cyp-player.theme-light .cyp-timeline-track {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.cyp-player.theme-light .cyp-timeline-buffer {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.cyp-player.theme-light .cyp-settings-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #18181b;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+}
+
+.cyp-player.theme-light .cyp-menu-item,
+.cyp-player.theme-light .cyp-menu-nav-btn {
+  color: #18181b;
+}

@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Custom Video Player (CYP) — Production Universal Video Engine</title>
+
+  <!-- Player Library Stylesheets & Favicon -->
+  <link rel="stylesheet" href="../styles/player.css">
+  <link rel="stylesheet" href="../styles/controls.css">
+  <link rel="stylesheet" href="../styles/themes.css">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="alternate icon" href="./favicon.ico">
+
+  <style>
+    /* ==========================================================================
+       Global Reset & Theme Variables (Neutral Zinc Design System)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-canvas: #09090b;
+      --bg-surface: #121215;
+      --bg-surface-elevated: #18181b;
+      --bg-surface-subtle: #202024;
+      --border-subtle: #27272a;
+      --border-strong: #3f3f46;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-default: #e50914;
+      --accent-hover: #b91c1c;
+      --accent-cyan: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-green: #22c55e;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+    }
+
+    body {
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================================
+       Sticky Global Navigation Bar
+       ========================================================================== */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-default);
+    }
+
+    .nav-version {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: #18181b;
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 150ms ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .npm-badge-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      background: #18181b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .npm-badge-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background: #202024;
+    }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: #27272a;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 12px;
+      text-decoration: none;
+      transition: all 150ms ease;
+    }
+
+    .github-link:hover {
+      background: #3f3f46;
+    }
+
+    /* ==========================================================================
+       Hero Section
+       ========================================================================== */
+    .hero-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 36px;
+      text-align: center;
+    }
+
+    .hero-tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+      padding: 5px 14px;
+      margin-bottom: 16px;
+    }
+
+    .status-dot-green {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .hero-subtitle {
+      max-width: 780px;
+      margin: 0 auto 28px;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .feature-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+
+    .feature-pill svg {
+      width: 13px;
+      height: 13px;
+      color: var(--accent-default);
+    }
+
+    /* ==========================================================================
+       Content Container & Section Cards
+       ========================================================================== */
+    .content-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .platform-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 36px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-title-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+    }
+
+    .card-title-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-badge.badge-accent {
+      color: var(--accent-default);
+      border-color: rgba(255, 23, 68, 0.3);
+      background: rgba(255, 23, 68, 0.08);
+    }
+
+    /* ==========================================================================
+       Stream Source & URL Loader Toolbar
+       ========================================================================== */
+    .stream-loader-bar {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .loader-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .input-prefix-icon {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+    }
+
+    .input-stream {
+      flex: 1;
+      min-width: 240px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 150ms ease;
+    }
+
+    .input-stream:focus {
+      border-color: var(--text-secondary);
+    }
+
+    .target-select {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 150ms ease;
+    }
+
+    .btn-primary {
+      background: var(--accent-default);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
+    }
+
+    .preset-chips-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chips-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+    }
+
+    .chip-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 5px 10px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .chip-btn.active {
+      border-color: var(--accent-default);
+      color: #ffffff;
+      background: rgba(255, 23, 68, 0.12);
+    }
+
+    /* ==========================================================================
+       Player Container & Host Styling
+       ========================================================================== */
+    .player-host-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000000;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+      margin-bottom: 20px;
+    }
+
+    #player-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+
+    /* ==========================================================================
+       Interactive Quick Controls Toolbar
+       ========================================================================== */
+    .quick-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+    }
+
+    .toolbar-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toolbar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .toolbar-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background: var(--bg-surface-subtle);
+    }
+
+    .toolbar-btn.active {
+      background: var(--accent-default);
+      color: #ffffff;
+      border-color: var(--accent-default);
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border-subtle);
+      margin: 0 4px;
+    }
+
+    /* ==========================================================================
+       Live Event Bus Terminal
+       ========================================================================== */
+    .terminal-container {
+      background: #09090b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .terminal-header {
+      background: #121215;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .terminal-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .terminal-log {
+      height: 120px;
+      overflow-y: auto;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.6;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .terminal-log::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .terminal-log::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .log-entry {
+      color: #a1a1aa;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log-time {
+      color: #71717a;
+    }
+
+    .log-tag-event {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .log-tag-error {
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    .log-tag-sys {
+      color: #a1a1aa;
+    }
+
+    /* ==========================================================================
+       Security & Shielding Info Box
+       ========================================================================== */
+    .security-notice-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(24, 24, 27, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .notice-icon {
+      color: var(--accent-default);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ==========================================================================
+       Developer UI Models & Presets Gallery
+       ========================================================================== */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .preset-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 180ms ease;
+      position: relative;
+    }
+
+    .preset-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .preset-card.active {
+      border-color: var(--card-accent, var(--accent-default));
+      background: rgba(24, 24, 27, 0.9);
+      box-shadow: 0 0 0 1px var(--card-accent, var(--accent-default)), 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .preset-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .preset-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--card-accent, #ffffff);
+    }
+
+    .preset-card-sector {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .preset-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .preset-specs-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 8px;
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==========================================================================
+       Customization Studio Configurator
+       ========================================================================== */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .studio-box {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .studio-box-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .color-swatches-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .color-swatch-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease;
+    }
+
+    .color-swatch-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .color-swatch-btn.active {
+      border-color: #ffffff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    }
+
+    .pills-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill-select-btn {
+      padding: 6px 12px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .pill-select-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .pill-select-btn.active {
+      background: #27272a;
+      color: #ffffff;
+      border-color: var(--accent-default);
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .form-row label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .form-select, .form-range {
+      width: 100%;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .form-range {
+      padding: 0;
+      accent-color: var(--accent-default);
+    }
+
+    .checkboxes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .checkbox-item input {
+      accent-color: var(--accent-default);
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       Code Snippet Generator & Tabs
+       ========================================================================== */
+    .code-generator-card {
+      background: #09090b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .code-tabs-header {
+      background: #121215;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+
+    .code-tab-buttons {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .code-tab-btn {
+      padding: 12px 14px;
+      background: transparent;
+      border: 0;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 120ms ease;
+    }
+
+    .code-tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .code-tab-btn.active {
+      color: #ffffff;
+      border-bottom-color: var(--accent-default);
+    }
+
+    .code-box-pre {
+      padding: 18px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #e4e4e7;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* ==========================================================================
+       Interactive Developer Documentation Guide (Tabbed)
+       ========================================================================== */
+    .guide-tabs-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .guide-tab-nav-btn {
+      padding: 10px 16px;
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 150ms ease;
+    }
+
+    .guide-tab-nav-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .guide-tab-nav-btn.active {
+      color: var(--accent-default);
+      border-bottom-color: var(--accent-default);
+    }
+
+    .guide-panel {
+      display: none;
+      line-height: 1.65;
+    }
+
+    .guide-panel.active {
+      display: block;
+      animation: fadeIn 150ms ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .guide-lead {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .guide-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .step-card-num {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 50%;
+      background: var(--accent-default);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .step-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .step-card-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    /* ==========================================================================
+       API Reference Cheatsheet Tables
+       ========================================================================== */
+    .api-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+    }
+
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .api-table th {
+      background: #18181b;
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .api-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .api-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .api-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .api-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .site-footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .site-footer a:hover {
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       Mobile Navigation Drawer & Responsive Styles
+       ========================================================================== */
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .mobile-menu-btn:hover {
+      border-color: var(--border-strong);
+      color: #ffffff;
+    }
+
+    .mobile-nav-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(9, 9, 11, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 20px 18px;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      animation: navSlideDown 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-nav-menu.is-open {
+      display: flex;
+    }
+
+    @keyframes navSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mobile-nav-link {
+      display: block;
+      padding: 10px 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 140ms ease;
+    }
+
+    .mobile-nav-link:hover, .mobile-nav-link:active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      padding-left: 18px;
+    }
+
+    /* ==========================================================================
+       Responsive Breakpoints (Desktop, Tablet, Mobile)
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .hero-title {
+        font-size: clamp(2rem, 5vw, 2.75rem);
+      }
+      .presets-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .hero-section {
+        padding: 44px 20px 32px;
+      }
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .card-header .card-badge {
+        align-self: flex-start;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding: 0 14px 60px;
+      }
+      .platform-card {
+        padding: 20px 14px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+      }
+      .loader-input-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .loader-input-row .input-stream,
+      .loader-input-row .target-select,
+      .loader-input-row .btn-action {
+        width: 100%;
+        min-height: 44px;
+      }
+      .loader-input-row .btn-action {
+        justify-content: center;
+      }
+      .preset-chips-row {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .preset-chips-row::-webkit-scrollbar {
+        display: none;
+      }
+      .preset-chips-row .chip-btn {
+        flex-shrink: 0;
+      }
+      .presets-grid {
+        grid-template-columns: 1fr;
+      }
+      .studio-grid {
+        grid-template-columns: 1fr;
+      }
+      .checkboxes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .quick-toolbar {
+        gap: 6px;
+        padding: 10px;
+      }
+      .toolbar-group {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+      .toolbar-btn {
+        flex: 1 1 auto;
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        justify-content: center;
+      }
+      .toolbar-divider {
+        display: none;
+      }
+      .code-tabs-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .code-tab-buttons {
+        overflow-x: auto;
+        scrollbar-width: none;
+        white-space: nowrap;
+        width: 100%;
+      }
+      .code-tab-buttons::-webkit-scrollbar {
+        display: none;
+      }
+      .btn-copy-code {
+        width: 100%;
+        height: 38px;
+        justify-content: center;
+      }
+      .guide-tabs-nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .guide-tabs-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .guide-tab-nav-btn {
+        flex-shrink: 0;
+      }
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+      .security-grid {
+        grid-template-columns: 1fr;
+      }
+      .api-table {
+        min-width: 540px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-inner {
+        padding: 0 4px;
+      }
+      .nav-brand span:not(.nav-version) {
+        font-size: 0.9rem;
+      }
+      .npm-badge-btn {
+        display: none;
+      }
+      .hero-title {
+        font-size: 1.85rem;
+      }
+      .hero-subtitle {
+        font-size: 0.88rem;
+      }
+      .hero-pills {
+        gap: 6px;
+      }
+      .feature-pill {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+      }
+      .checkboxes-grid {
+        grid-template-columns: 1fr;
+      }
+      .color-swatches-row {
+        gap: 6px;
+      }
+      .color-swatch-btn {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sticky Global Navigation Bar -->
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <polygon points="6 4 20 12 6 20 6 4" />
+          </svg>
+        </div>
+        <span>Custom Video Player</span>
+        <span class="nav-version">v0.1.0</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#interactive-suite">Playground</a>
+        <a href="#ui-presets">UI Models</a>
+        <a href="#customization-studio">Studio</a>
+        <a href="#developer-guide">Guide & Shielding</a>
+        <a href="#api-reference">API</a>
+        <a href="#web-component">Web Component</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="btn-copy-install" class="npm-badge-btn" title="Click to copy install command">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="install-text">npm i @researchertizar/cyp-player</span>
+        </button>
+        <a href="https://github.com/researchertizar" target="_blank" rel="noopener noreferrer" class="github-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <button id="btn-mobile-menu" class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <svg id="icon-mobile-menu" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-nav-menu" class="mobile-nav-menu">
+      <a href="#interactive-suite" class="mobile-nav-link">Interactive Playground</a>
+      <a href="#ui-presets" class="mobile-nav-link">Developer UI Models</a>
+      <a href="#customization-studio" class="mobile-nav-link">Customization Studio</a>
+      <a href="#developer-guide" class="mobile-nav-link">Developer Guide &amp; Shielding</a>
+      <a href="#api-reference" class="mobile-nav-link">Public API Reference</a>
+      <a href="#web-component" class="mobile-nav-link">Autonomous Web Component</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-tagline">
+      <span class="status-dot-green"></span> Production-Ready Video Engine
+    </div>
+    <h1 class="hero-title">Custom Video Player (CYP)</h1>
+    <p class="hero-subtitle">
+      Zero-dependency universal video player architecture for HTML5 videos and YouTube streams with link privacy shielding,
+      progressive disclosure, and 6 battle-tested developer UI presets.
+    </p>
+
+    <div class="hero-pills">
+      <span class="feature-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Zero Runtime Bloat (24KB gz)
+      </span>
+      <span class="feature-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        Stream Link Shielding
+      </span>
+      <span class="feature-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        Progressive Disclosure
+      </span>
+      <span class="feature-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg>
+        Autonomous Web Component
+      </span>
+      <span class="feature-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Smart Ad Passthrough
+      </span>
+    </div>
+  </section>
+
+  <!-- Main Content Wrapper -->
+  <main class="content-wrapper">
+
+    <!-- ======================================================================
+         SECTION 1: Interactive Player Playground
+         ====================================================================== -->
+    <section id="interactive-suite" class="platform-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+          <h2 class="card-title">Interactive Player Test Suite</h2>
+        </div>
+        <span class="card-badge badge-accent">Live Engine</span>
+      </div>
+
+      <!-- Stream Token & Target Loader Toolbar -->
+      <div class="stream-loader-bar">
+        <div class="loader-input-row">
+          <div class="input-prefix-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </div>
+          <input type="text" id="custom-video-input" class="input-stream"
+            placeholder="Paste YouTube URL, video ID, direct video file (.mp4, .webm), or shielded token (b64:...)" value="dQw4w9WgXcQ" spellcheck="false" />
+
+          <select id="player-target-select" class="target-select" title="Target Player Instance">
+            <option value="primary">Target: Primary Player (API)</option>
+            <option value="wc">Target: Web Component</option>
+          </select>
+
+          <button id="btn-load-custom" class="btn-action btn-primary">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Load Video</span>
+          </button>
+        </div>
+
+        <!-- 1-Click Stream Presets -->
+        <div class="preset-chips-row">
+          <span class="chips-label">Stream Presets:</span>
+          <button class="chip-btn active" data-id="dQw4w9WgXcQ" data-start="0">
+            YouTube (Rick Astley CC)
+          </button>
+          <button class="chip-btn" data-id="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" data-start="0">
+            HTML5 (Big Buck Bunny MP4)
+          </button>
+          <button class="chip-btn" data-id="b64:ZFF3NHc5V2dYY1E/dD0w" data-start="0">
+            Shielded Token (b64:...)
+          </button>
+          <button class="chip-btn" data-id="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" data-start="0">
+            HTML5 (Tears of Steel MP4)
+          </button>
+          <button class="chip-btn" data-id="L_LUpnjgPso" data-start="80">
+            YouTube (Starts @ 1m20s)
+          </button>
+        </div>
+      </div>
+
+      <!-- Primary Player Container -->
+      <div class="player-host-wrapper">
+        <div id="player-container"></div>
+      </div>
+
+      <!-- Quick Controls Toolbar -->
+      <div class="quick-toolbar">
+        <div class="toolbar-group">
+          <button id="btn-play" class="toolbar-btn btn-primary" title="Play">Play</button>
+          <button id="btn-pause" class="toolbar-btn" title="Pause">Pause</button>
+          <button id="btn-seek-back" class="toolbar-btn" title="Back 10s">-10s</button>
+          <button id="btn-seek-fwd" class="toolbar-btn" title="Forward 10s">+10s</button>
+          <button id="btn-seek-60" class="toolbar-btn" title="Seek to 1m">1:00</button>
+          <button id="btn-mute" class="toolbar-btn" title="Toggle Mute">Mute</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <div class="toolbar-group">
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Speed:</span>
+          <button id="btn-speed-1" class="toolbar-btn active">1.0×</button>
+          <button id="btn-speed-125" class="toolbar-btn">1.25×</button>
+          <button id="btn-speed-15" class="toolbar-btn">1.5×</button>
+          <button id="btn-speed-2" class="toolbar-btn">2.0×</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <div class="toolbar-group" id="demo-captions-group" style="display:none;">
+          <button id="btn-toggle-captions" class="toolbar-btn" title="Toggle Subtitles">CC: Off</button>
+          <select id="select-caption-lang" class="target-select" style="padding:4px 8px; font-size:0.75rem;">
+            <option value="">Captions: Off</option>
+          </select>
+        </div>
+
+        <div class="toolbar-group" id="studio-quality-row" style="display:none;">
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Stream:</span>
+          <select id="select-quality-studio" class="target-select" style="padding:4px 8px; font-size:0.75rem;">
+            <option value="auto">Auto</option>
+          </select>
+        </div>
+
+        <div class="toolbar-group" style="margin-left:auto;">
+          <button id="btn-fullscreen-toggle" class="toolbar-btn" title="Toggle Fullscreen">Fullscreen</button>
+        </div>
+      </div>
+
+      <!-- Live Event Bus Terminal -->
+      <div class="terminal-container">
+        <div class="terminal-header">
+          <div class="terminal-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 17 10 11 4 5"></polyline>
+              <line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+            <span>Live Player Event Bus Monitor</span>
+          </div>
+          <button id="btn-clear-log" class="chip-btn" style="padding:2px 8px; font-size:0.7rem;">Clear Log</button>
+        </div>
+        <div id="event-log" class="terminal-log">
+          <div class="log-entry"><span class="log-tag-sys">[System]</span> Initializing custom YouTube video player test suite...</div>
+        </div>
+      </div>
+
+      <!-- Security Notice -->
+      <div class="security-notice-box">
+        <div class="notice-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <div>
+          <strong>Privacy & Link Shielding Guardrails Active:</strong>
+          Context menus (<code>contextmenu</code>) and dragging are suppressed across all surfaces to shield raw video URLs from browser right-click copying. External third-party browser extension content scripts (such as <code>content-youtube-embed.js</code>) are trapped to maintain seamless execution.
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 2: Developer UI Models & Design Presets Gallery
+         ====================================================================== -->
+    <section id="ui-presets" class="platform-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+          </div>
+          <h2 class="card-title">Developer UI Models & Design Presets</h2>
+        </div>
+        <span class="card-badge">1-Click Live Switch</span>
+      </div>
+
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:18px;">
+        Choose from 6 production-grade design presets tailored for specific sectors. Clicking any card immediately applies typography, backdrop blur, control geometry, and accent tokens to the live player above.
+      </p>
+
+      <div class="presets-grid">
+        <!-- Preset 1: Glassmorphism -->
+        <div class="preset-card" data-preset="glass" style="--card-accent: #38bdf8;">
+          <div class="preset-card-header">
+            <div class="preset-card-title">
+              <span class="preset-dot"></span>
+              <span>Glassmorphism</span>
+            </div>
+            <span class="preset-card-sector">Frost Dock</span>
+          </div>
+          <p class="preset-card-desc">
+            Floating frosted-glass dock with 24px backdrop blur, translucent borders, and ambient electric cyan glow.
+          </p>
+          <div class="preset-specs-row">
+            <span class="spec-item">Radius: <strong>16px</strong></span>
+            <span class="spec-item">Track: <strong>4px</strong></span>
+            <span class="spec-item">Accent: <strong>#38bdf8</strong></span>
+          </div>
+        </div>
+
+        <!-- Preset 2: Modern Minimal -->
+        <div class="preset-card" data-preset="minimal" style="--card-accent: #ffffff;">
+          <div class="preset-card-header">
+            <div class="preset-card-title">
+              <span class="preset-dot"></span>
+              <span>Modern Minimal</span>
+            </div>
+            <span class="preset-card-sector">Floating Pill</span>
+          </div>
+          <p class="preset-card-desc">
+            Distraction-free floating pill dock with pure monochrome white highlights and slender 3px seeker track.
+          </p>
+          <div class="preset-specs-row">
+            <span class="spec-item">Radius: <strong>24px</strong></span>
+            <span class="spec-item">Track: <strong>3px</strong></span>
+            <span class="spec-item">Accent: <strong>#ffffff</strong></span>
+          </div>
+        </div>
+
+        <!-- Preset 3: Professional Studio -->
+        <div class="preset-card" data-preset="professional" style="--card-accent: #f59e0b;">
+          <div class="preset-card-header">
+            <div class="preset-card-title">
+              <span class="preset-dot"></span>
+              <span>Professional Studio</span>
+            </div>
+            <span class="preset-card-sector">Broadcast</span>
+          </div>
+          <p class="preset-card-desc">
+            Broadcast workstation console with dark charcoal matte, studio amber tally, and monospace timecode.
+          </p>
+          <div class="preset-specs-row">
+            <span class="spec-item">Radius: <strong>6px</strong></span>
+            <span class="spec-item">Track: <strong>5px</strong></span>
+            <span class="spec-item">Accent: <strong>#f59e0b</strong></span>
+          </div>
+        </div>
+
+        <!-- Preset 4: Cyber Advanced HUD -->
+        <div class="preset-card" data-preset="cyber" style="--card-accent: #00ffcc;">
+          <div class="preset-card-header">
+            <div class="preset-card-title">
+              <span class="preset-dot"></span>
+              <span>Cyber Advanced</span>
+            </div>
+            <span class="preset-card-sector">Sci-Fi HUD</span>
+          </div>
+          <p class="preset-card-desc">
+            Futuristic HUD console with sharp angular lines, high-tech status indicators, and neon cyan glow.
+          </p>
+          <div class="preset-specs-row">
+            <span class="spec-item">Radius: <strong>2px</strong></span>
+            <span class="spec-item">Track: <strong>4px</strong></span>
+            <span class="spec-item">Accent: <strong>#00ffcc</strong></span>
+          </div>
+        </div>
+
+        <!-- Preset 5: Cinema OLED Gold -->
+        <div class="preset-card" data-preset="cinema" style="--card-accent: #d4af37;">
+          <div class="preset-card-header">
+            <div class="preset-card-title">
+              <span class="preset-dot"></span>
+              <span>Cinema OLED</span>
+            </div>
+            <span class="preset-card-sector">Champagne</span>
+          </div>
+          <p class="preset-card-desc">
+            Pure pitch-black canvas with warm champagne gold accent and subtle cinematic edge softness for movies.
+          </p>
+          <div class="preset-specs-row">
+            <span class="spec-item">Radius: <strong>8px</strong></span>
+            <span class="spec-item">Track: <strong>4px</strong></span>
+            <span class="spec-item">Accent: <strong>#d4af37</strong></span>
+          </div>
+        </div>
+
+        <!-- Preset 6: Classic Dark -->
+        <div class="preset-card active" data-preset="dark" style="--card-accent: #e50914;">
+          <div class="preset-card-header">
+            <div class="preset-card-title">
+              <span class="preset-dot"></span>
+              <span>Classic Dark</span>
+            </div>
+            <span class="preset-card-sector">Default</span>
+          </div>
+          <p class="preset-card-desc">
+            Standard neutral dark zinc video player with signature video red accent and balanced contrast.
+          </p>
+          <div class="preset-specs-row">
+            <span class="spec-item">Radius: <strong>12px</strong></span>
+            <span class="spec-item">Track: <strong>5px</strong></span>
+            <span class="spec-item">Accent: <strong>#e50914</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 3: Customization Studio & Live Configurator
+         ====================================================================== -->
+    <section id="customization-studio" class="platform-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <h2 class="card-title">Customization Studio & Live Code Generator</h2>
+        </div>
+        <span class="card-badge badge-accent">Interactive</span>
+      </div>
+
+      <!-- Studio Configurator Grid -->
+      <div class="studio-grid">
+        <!-- 1. Theme & Accent -->
+        <div class="studio-box">
+          <div class="studio-box-title">
+            <span>Accent Highlight</span>
+            <span id="label-accent-color" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary);">#e50914</span>
+          </div>
+          <div class="color-swatches-row">
+            <button class="color-swatch-btn active" data-color="#e50914" style="background:#e50914;" title="Video Red"></button>
+            <button class="color-swatch-btn" data-color="#f4f4f5" style="background:#f4f4f5;" title="Clean Slate"></button>
+            <button class="color-swatch-btn" data-color="#0284c7" style="background:#0284c7;" title="Sky Blue"></button>
+            <button class="color-swatch-btn" data-color="#059669" style="background:#059669;" title="Emerald"></button>
+            <button class="color-swatch-btn" data-color="#d97706" style="background:#d97706;" title="Studio Amber"></button>
+            <button class="color-swatch-btn" data-color="#c5a059" style="background:#c5a059;" title="Champagne Gold"></button>
+            <button class="color-swatch-btn" data-color="#6366f1" style="background:#6366f1;" title="Indigo"></button>
+            <input type="color" id="studio-color-picker" value="#e50914"
+              style="width:26px; height:26px; border:0; padding:0; background:transparent; cursor:pointer;" title="Custom Color Picker" />
+          </div>
+          <div class="form-row">
+            <label>Corner Radius:</label>
+            <div id="radius-pills" class="pills-group">
+              <button class="pill-select-btn" data-radius="0">0px (Sharp)</button>
+              <button class="pill-select-btn" data-radius="6">6px</button>
+              <button class="pill-select-btn active" data-radius="12">12px (Round)</button>
+              <button class="pill-select-btn" data-radius="24">24px (Pill)</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Seeker Track Thickness:</label>
+            <div id="track-pills" class="pills-group">
+              <button class="pill-select-btn" data-height="3">3px</button>
+              <button class="pill-select-btn" data-height="4">4px</button>
+              <button class="pill-select-btn active" data-height="5">5px (Default)</button>
+              <button class="pill-select-btn" data-height="8">8px</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Watermark Logo & Poster -->
+        <div class="studio-box">
+          <div class="studio-box-title">
+            <span>Branding Watermark</span>
+          </div>
+          <div class="form-row">
+            <label class="checkbox-item">
+              <input type="checkbox" id="check-enable-logo" checked />
+              <span>Display Watermark Logo</span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>Logo Position:</label>
+            <select id="select-logo-pos" class="form-select">
+              <option value="top-right" selected>Top Right</option>
+              <option value="top-left">Top Left</option>
+              <option value="bottom-right">Bottom Right</option>
+              <option value="bottom-left">Bottom Left</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary);">
+              <span>Logo Opacity:</span>
+              <span id="label-logo-opacity">85%</span>
+            </div>
+            <input type="range" id="range-logo-opacity" class="form-range" min="10" max="100" value="85" />
+          </div>
+        </div>
+
+        <!-- 3. Control Button Visibility -->
+        <div class="studio-box">
+          <div class="studio-box-title">
+            <span>Control Buttons Visibility</span>
+          </div>
+          <div class="checkboxes-grid">
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="play" checked /> Play / Pause</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="rewind" checked /> Rewind 10s</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="forward" checked /> Forward 10s</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="volume" checked /> Volume & Mute</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="time" checked /> Time Display</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="captions" checked /> Subtitles / CC</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="chapters" checked /> Chapters</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="settings" checked /> Settings</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="theater" checked /> Theater Mode</label>
+            <label class="checkbox-item"><input type="checkbox" class="ctrl-toggle" data-control="fullscreen" checked /> Fullscreen</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Generated Code Box -->
+      <div class="code-generator-card">
+        <div class="code-tabs-header">
+          <div class="code-tab-buttons">
+            <button class="code-tab-btn active" data-tab="preset">Preset Model (Recommended)</button>
+            <button class="code-tab-btn" data-tab="granular">Granular Config</button>
+            <button class="code-tab-btn" data-tab="react">React / Next.js</button>
+            <button class="code-tab-btn" data-tab="wc">Web Component</button>
+          </div>
+          <button id="btn-copy-code" class="chip-btn" style="padding:4px 10px;">
+            Copy Code
+          </button>
+        </div>
+        <pre id="code-snippet-pre" class="code-box-pre"><code>// Loading snippet...</code></pre>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 4: Developer Guide & Shielding Architecture
+         ====================================================================== -->
+    <section id="developer-guide" class="platform-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </div>
+          <h2 class="card-title">Developer Implementation Guide</h2>
+        </div>
+        <span class="card-badge">Documentation</span>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="guide-tabs-nav">
+        <button class="guide-tab-nav-btn active" data-panel="panel-adding-links">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          Adding Video Links
+        </button>
+        <button class="guide-tab-nav-btn" data-panel="panel-shielding-links">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          Shielding & Hiding Links
+        </button>
+        <button class="guide-tab-nav-btn" data-panel="panel-frameworks">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          Framework Integrations
+        </button>
+        <button class="guide-tab-nav-btn" data-panel="panel-plugins">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Plugins Architecture
+        </button>
+      </div>
+
+      <!-- Panel 1: Adding Video Links -->
+      <div id="panel-adding-links" class="guide-panel active">
+        <p class="guide-lead">
+          The player engine includes a robust parser that accepts any standard YouTube link format, timestamp, or video ID.
+        </p>
+
+        <div class="guide-steps-list">
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">1</span> Supported URL Formats</h3>
+            <p class="step-card-text">You can pass full watch links, short URLs, embed links, Shorts, or bare IDs:</p>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>// Standard watch URL:
+player.load('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+// Short link (youtu.be):
+player.load('https://youtu.be/dQw4w9WgXcQ');
+
+// With timestamp (e.g. start at 1m 25s):
+player.load('https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=85s');
+
+// Bare 11-character video ID:
+player.load('dQw4w9WgXcQ');</code></pre>
+          </div>
+
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">2</span> Programmatic Start Timestamps</h3>
+            <p class="step-card-text">Provide an explicit starting offset in seconds as the second argument to <code>player.load()</code>:</p>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>// Start playback at 45 seconds:
+player.load('dQw4w9WgXcQ', 45);</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Shielding & Hiding Links -->
+      <div id="panel-shielding-links" class="guide-panel">
+        <p class="guide-lead">
+          How to protect paid course videos, SaaS content, and membership video assets from user scraping.
+        </p>
+
+        <div class="guide-steps-list">
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">1</span> Context Menu & Click Interceptor</h3>
+            <p class="step-card-text">
+              The player automatically places an invisible click-shield layer over the video and suppresses <code>contextmenu</code> events. Right-clicking or dragging the video will never show YouTube's "Copy video URL" or redirect to external pages.
+            </p>
+          </div>
+
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">2</span> Stream Token Obfuscation (b64:...)</h3>
+            <p class="step-card-text">
+              Instead of placing raw YouTube IDs in the HTML, generate protected stream tokens on your backend and send them to the client:
+            </p>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>// Node.js Backend API Route:
+function createToken(videoId, startSec = 0) {
+  const payload = startSec > 0 ? `${videoId}?t=${startSec}` : videoId;
+  return 'b64:' + Buffer.from(payload).toString('base64');
+}
+
+// Client Application:
+player.load('b64:ZFF3NHc5V2dYY1E/dD0w');
+// DOM inspector shows only: &lt;div data-stream="b64:..."&gt;</code></pre>
+          </div>
+
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">3</span> Smart Ad Passthrough</h3>
+            <p class="step-card-text">
+              While external clicks are shielded during normal video playback, the engine monitors player state. If an advertisement appears, pointer events are automatically unlocked directly onto the iframe so users can click <strong>"Skip Ad"</strong>. Once the ad ends, security shielding re-locks instantly.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Framework Integrations -->
+      <div id="panel-frameworks" class="guide-panel">
+        <p class="guide-lead">
+          Implementation patterns for React, Next.js, Vue 3, Svelte, and Native HTML.
+        </p>
+
+        <div class="guide-steps-list">
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">1</span> React / Next.js Hook & Component</h3>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>import React, { useEffect, useRef } from 'react';
+import { createPlayer } from 'custom-youtube-player';
+import 'custom-youtube-player/style';
+
+export function MyVideo({ videoId }) {
+  const containerRef = useRef(null);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const player = createPlayer({
+      element: containerRef.current,
+      videoId,
+      preset: 'glass',
+      lazy: true
+    });
+    playerRef.current = player;
+    return () => player.destroy();
+  }, [videoId]);
+
+  return &lt;div ref={containerRef} className="aspect-video w-full" /&gt;;
+}</code></pre>
+          </div>
+
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">2</span> Autonomous Web Component</h3>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>&lt;!-- Import bundle --&gt;
+&lt;script type="module" src="custom-youtube-player/dist/player.es.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="custom-youtube-player/dist/player.css"&gt;
+
+&lt;!-- Use anywhere in HTML --&gt;
+&lt;custom-youtube-player video-id="dQw4w9WgXcQ" preset="cinema" lazy="true"&gt;
+&lt;/custom-youtube-player&gt;</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Plugins Architecture -->
+      <div id="panel-plugins" class="guide-panel">
+        <p class="guide-lead">
+          Easily extend the player with built-in or custom plugins using our lightweight plugin interface.
+        </p>
+
+        <div class="guide-steps-list">
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">1</span> Built-In Plugins</h3>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>import { 
+  createPlayer, 
+  resumePlugin, 
+  chaptersPlugin, 
+  keyboardPlugin, 
+  gesturesPlugin 
+} from 'custom-youtube-player';
+
+const player = createPlayer({
+  element: '#player',
+  videoId: 'dQw4w9WgXcQ',
+  plugins: [
+    resumePlugin(),       // Remembers position in localStorage
+    keyboardPlugin(),     // Space, J, K, L, M, F, T shortcuts
+    gesturesPlugin(),     // Mobile double-tap left/right seeking
+    chaptersPlugin({      // Chapter markers & drawer
+      chapters: [
+        { time: 0, title: 'Intro' },
+        { time: 45, title: 'Deep Dive' }
+      ]
+    })
+  ]
+});</code></pre>
+          </div>
+
+          <div class="step-card">
+            <h3 class="step-card-title"><span class="step-card-num">2</span> Writing a Custom Plugin</h3>
+            <pre class="code-box-pre" style="background:#09090b; border-radius:8px; padding:12px;"><code>const analyticsPlugin = () => ({
+  name: 'analytics',
+  install(player) {
+    player.on('playing', () => console.log('Playback started'));
+    player.on('ended', () => console.log('Playback finished'));
+  },
+  destroy(player) {
+    // cleanup
+  }
+});
+
+player.use(analyticsPlugin());</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 5: Interactive API Reference Cheat Sheet
+         ====================================================================== -->
+    <section id="api-reference" class="platform-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
+          <h2 class="card-title">Public API Reference</h2>
+        </div>
+        <span class="card-badge">TypeScript Typed</span>
+      </div>
+
+      <div class="api-table-wrapper">
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Parameters</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="api-code">player.play()</span></td>
+              <td><code>None</code></td>
+              <td>Starts or resumes playback. Returns Promise.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.pause()</span></td>
+              <td><code>None</code></td>
+              <td>Pauses video playback.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.togglePlay()</span></td>
+              <td><code>None</code></td>
+              <td>Toggles playback state between play and pause.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.seekTo(sec)</span></td>
+              <td><code>seconds: number</code></td>
+              <td>Seeks to an exact timestamp in seconds.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.seekBy(offset)</span></td>
+              <td><code>offsetSeconds: number</code></td>
+              <td>Seeks relative to current playback position (e.g. <code>+10</code> or <code>-10</code>).</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.setVolume(val)</span></td>
+              <td><code>volume: 0..100</code></td>
+              <td>Adjusts player audio volume.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.setPlaybackRate(r)</span></td>
+              <td><code>rate: 0.5..2.0</code></td>
+              <td>Sets playback speed rate (0.5, 0.75, 1, 1.25, 1.5, 1.75, 2).</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.load(target, sec?)</span></td>
+              <td><code>target: string, start?: number</code></td>
+              <td>Loads a new video by URL, video ID, or <code>b64:...</code> token.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.applyPreset(name)</span></td>
+              <td><code>preset: 'glass'|'minimal'|...</code></td>
+              <td>Applies complete design model preset dynamically.</td>
+            </tr>
+            <tr>
+              <td><span class="api-code">player.destroy()</span></td>
+              <td><code>None</code></td>
+              <td>Cleans up timers, event listeners, plugins, and removes DOM elements.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SECTION 6: Autonomous Web Component Showcase
+         ====================================================================== -->
+    <section id="web-component" class="platform-card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h2 class="card-title">Autonomous Native Web Component Showcase</h2>
+        </div>
+        <span class="card-badge badge-accent">&lt;custom-video-player&gt;</span>
+      </div>
+
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+        Zero-setup Custom Element that works directly in vanilla HTML or any modern framework without wrapper libraries.
+        Supports reactive attributes: <code>src</code>, <code>video-id</code>, <code>preset</code>, <code>theme</code>, <code>accent-color</code>, and <code>radius</code>.
+      </p>
+
+      <div class="player-host-wrapper">
+        <custom-video-player id="demo-web-component" video-id="dQw4w9WgXcQ" preset="cinema" theme="cinema" accent-color="#d4af37"
+          radius="8" lazy="true">
+        </custom-video-player>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <p>
+      Custom Video Player (CYP) v0.1.0 — Built with pure Vanilla JavaScript & CSS Variables. Zero runtime dependencies.
+    </p>
+    <p style="margin-top:6px;">
+      Released under the <a href="../LICENSE">MIT License</a>.
+    </p>
+  </footer>
+
+  <!-- ======================================================================
+       Module Script: Interactive Application Logic
+       ====================================================================== -->
+  <script type="module">
+    import {
+      createPlayer,
+      parseYouTubeUrl,
+      encodeStreamToken,
+      decodeStreamToken,
+      chaptersPlugin,
+      resumePlugin,
+      keyboardPlugin,
+      gesturesPlugin,
+      PlayerPresets
+    } from '../src/index.js';
+
+    // 1. Extension Isolation Guardrail
+    window.addEventListener('error', (event) => {
+      if (event.filename && event.filename.includes('content-youtube-embed')) {
+        event.preventDefault();
+        return true;
+      }
+    });
+
+    // 2. Terminal Event Logger
+    const logEl = document.getElementById('event-log');
+    function log(msg, type = 'sys') {
+      const now = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+
+      let tagSpan = '<span class="log-tag-sys">[System]</span> ';
+      if (type === 'event') tagSpan = '<span class="log-tag-event">[Event]</span> ';
+      if (type === 'error') tagSpan = '<span class="log-tag-error">[Error]</span> ';
+
+      entry.innerHTML = `${tagSpan}<span class="log-time">${now}</span> ${msg}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById('btn-clear-log').addEventListener('click', () => {
+      logEl.innerHTML = '';
+      log('Terminal monitor cleared.');
+    });
+
+    // 3. Primary Player Initialization
+    const defaultLogoUrl = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' fill='none'><rect width='120' height='30' rx='6' fill='%23121215' fill-opacity='0.85' stroke='%2327272a'/><polygon points='14,9 22,15 14,21' fill='%23e50914'/><text x='30' y='19' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif' font-size='10' font-weight='700' fill='%23f4f4f5' letter-spacing='0.6'>PLAYER PRO</text></svg>";
+
+    const player = createPlayer({
+      element: '#player-container',
+      videoId: 'dQw4w9WgXcQ',
+      preset: 'dark',
+      theme: 'dark',
+      lazy: true,
+      accentColor: '#e50914',
+      trackHeight: 5,
+      radius: 12,
+      logo: {
+        src: defaultLogoUrl,
+        position: 'top-right',
+        opacity: 0.85
+      },
+      plugins: [
+        resumePlugin(),
+        keyboardPlugin(),
+        gesturesPlugin(),
+        chaptersPlugin({
+          chapters: [
+            { time: 0, title: 'Intro' },
+            { time: 43, title: 'Verse 1' },
+            { time: 85, title: 'Chorus' },
+            { time: 140, title: 'Bridge' },
+            { time: 190, title: 'Outro' }
+          ]
+        })
+      ]
+    });
+    window.player = player;
+
+    // 4. Player Event Bus Subscriptions
+    const studioQualityRow = document.getElementById('studio-quality-row');
+    const selectQualityStudio = document.getElementById('select-quality-studio');
+    const demoCaptionsGroup = document.getElementById('demo-captions-group');
+    const btnToggleCC = document.getElementById('btn-toggle-captions');
+    const selectCCLang = document.getElementById('select-caption-lang');
+
+    player.on('ready', () => {
+      const duration = Math.round(player.getDuration()) || 0;
+      log(`Player ready for playback (Duration: ${duration}s)`, 'event');
+
+      // Populate progressive disclosure quality streams
+      const levels = player.getAvailableQualityLevels();
+      const hasQuality = Array.isArray(levels) && levels.length > 1;
+      studioQualityRow.style.display = hasQuality ? 'inline-flex' : 'none';
+      if (hasQuality) {
+        selectQualityStudio.innerHTML = '<option value="auto">Quality: Auto</option>';
+        levels.forEach((lvl) => {
+          if (lvl !== 'auto') {
+            const opt = document.createElement('option');
+            opt.value = lvl;
+            opt.textContent = lvl.toUpperCase();
+            selectQualityStudio.appendChild(opt);
+          }
+        });
+        log(`Multi-resolution streams detected: ${levels.join(', ')}`, 'event');
+      }
+    });
+
+    player.on('playing', () => log(`Playing at ${Math.round(player.getCurrentTime())}s`, 'event'));
+    player.on('pause', () => log('Playback paused', 'event'));
+    player.on('ended', () => log('Video completed', 'event'));
+    player.on('buffering', () => log('Buffering stream data...', 'event'));
+    player.on('change:volume', (vol) => log(`Volume adjusted: ${vol}%`, 'event'));
+    player.on('change:playbackRate', (rate) => log(`Speed changed: ${rate}×`, 'event'));
+    player.on('change:title', (title) => log(`Title loaded: "${title}"`, 'event'));
+    player.on('error', (err) => log(`Player Error: ${err.message}`, 'error'));
+
+    // Captions Event Handling
+    player.on('change:captionsEnabled', (enabled) => {
+      btnToggleCC.textContent = `CC: ${enabled ? 'On' : 'Off'}`;
+      btnToggleCC.classList.toggle('active', enabled);
+      log(`Subtitles ${enabled ? 'Enabled' : 'Disabled'}`, 'event');
+    });
+
+    player.on('change:captionTrack', (track) => {
+      selectCCLang.value = track || '';
+      log(`Active Subtitle Track: ${track || 'Off'}`, 'event');
+    });
+
+    player.on('change:captionTracks', (tracks) => {
+      const hasCaptions = Array.isArray(tracks) && tracks.length > 0;
+      demoCaptionsGroup.style.display = hasCaptions ? 'inline-flex' : 'none';
+      selectCCLang.innerHTML = '<option value="">Captions: Off</option>';
+      if (hasCaptions) {
+        tracks.forEach((t) => {
+          const opt = document.createElement('option');
+          opt.value = t.languageCode;
+          opt.textContent = t.displayName || t.languageCode;
+          selectCCLang.appendChild(opt);
+        });
+      }
+    });
+
+    btnToggleCC.addEventListener('click', () => player.toggleCaptions());
+    selectCCLang.addEventListener('change', (e) => player.setCaptionTrack(e.target.value || null));
+
+    // 5. Stream Input & Loader Controls
+    const urlInput = document.getElementById('custom-video-input');
+    const targetSelect = document.getElementById('player-target-select');
+    const btnLoad = document.getElementById('btn-load-custom');
+    const wcElement = document.getElementById('demo-web-component');
+
+    function loadVideoInput(startSeconds = 0) {
+      const raw = urlInput.value.trim();
+      if (!raw) return;
+
+      const target = targetSelect.value;
+      if (target === 'wc') {
+        log(`Loading into Web Component: ${raw}`);
+        if (wcElement) wcElement.setAttribute('video-id', raw);
+      } else {
+        log(`Loading into Primary Player: ${raw}`);
+        player.load(raw, startSeconds);
+      }
+    }
+
+    btnLoad.addEventListener('click', () => loadVideoInput());
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadVideoInput();
+    });
+
+    // Preset Chips
+    const presetChips = document.querySelectorAll('.chip-btn[data-id]');
+    presetChips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        presetChips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        const id = chip.getAttribute('data-id');
+        const start = Number(chip.getAttribute('data-start') || 0);
+        urlInput.value = id;
+        loadVideoInput(start);
+      });
+    });
+
+    // 6. Quick Toolbar Button Events
+    document.getElementById('btn-play').addEventListener('click', () => player.play());
+    document.getElementById('btn-pause').addEventListener('click', () => player.pause());
+    document.getElementById('btn-seek-back').addEventListener('click', () => player.seekBy(-10));
+    document.getElementById('btn-seek-fwd').addEventListener('click', () => player.seekBy(10));
+    document.getElementById('btn-seek-60').addEventListener('click', () => player.seekTo(60));
+    document.getElementById('btn-mute').addEventListener('click', () => player.toggleMute());
+    document.getElementById('btn-fullscreen-toggle').addEventListener('click', () => player.events.emit('ui:toggle-fullscreen'));
+
+    // Speed Toolbar Buttons
+    const speedButtons = [
+      { id: 'btn-speed-1', rate: 1.0 },
+      { id: 'btn-speed-125', rate: 1.25 },
+      { id: 'btn-speed-15', rate: 1.5 },
+      { id: 'btn-speed-2', rate: 2.0 }
+    ];
+
+    speedButtons.forEach(({ id, rate }) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.addEventListener('click', () => {
+          speedButtons.forEach((s) => document.getElementById(s.id)?.classList.remove('active'));
+          btn.classList.add('active');
+          player.setPlaybackRate(rate);
+        });
+      }
+    });
+
+    // 7. Developer UI Models & Design Presets Gallery
+    const presetCards = document.querySelectorAll('.preset-card');
+    const labelAccent = document.getElementById('label-accent-color');
+    const colorPicker = document.getElementById('studio-color-picker');
+    const radiusPills = document.querySelectorAll('#radius-pills .pill-select-btn');
+    const trackPills = document.querySelectorAll('#track-pills .pill-select-btn');
+    const swatches = document.querySelectorAll('.color-swatch-btn');
+
+    let currentConfig = {
+      preset: 'dark',
+      theme: 'dark',
+      accentColor: '#e50914',
+      trackHeight: 5,
+      radius: 12,
+      logo: {
+        src: defaultLogoUrl,
+        position: 'top-right',
+        opacity: 0.85
+      }
+    };
+
+    function syncStudioFromPreset(key) {
+      const preset = PlayerPresets[key];
+      if (!preset) return;
+
+      currentConfig.preset = key;
+      currentConfig.theme = preset.theme;
+      currentConfig.accentColor = preset.accentColor;
+      currentConfig.radius = preset.radius;
+      currentConfig.trackHeight = preset.trackHeight;
+
+      presetCards.forEach((c) => c.classList.toggle('active', c.getAttribute('data-preset') === key));
+      if (labelAccent) labelAccent.textContent = preset.accentColor;
+      if (colorPicker) colorPicker.value = preset.accentColor;
+
+      swatches.forEach((s) => s.classList.toggle('active', s.getAttribute('data-color') === preset.accentColor));
+      radiusPills.forEach((p) => p.classList.toggle('active', Number(p.getAttribute('data-radius')) === preset.radius));
+      trackPills.forEach((p) => p.classList.toggle('active', Number(p.getAttribute('data-height')) === preset.trackHeight));
+
+      if (wcElement) {
+        wcElement.setAttribute('preset', key);
+        wcElement.setAttribute('accent-color', preset.accentColor);
+        wcElement.setAttribute('radius', String(preset.radius));
+      }
+
+      updateCodeSnippet();
+    }
+
+    presetCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const key = card.getAttribute('data-preset');
+        player.applyPreset(key);
+        syncStudioFromPreset(key);
+        log(`Applied Preset Model: "${PlayerPresets[key]?.name || key}"`, 'event');
+      });
+    });
+
+    // 8. Customization Studio Granular Handlers
+    function applyAccentColor(color) {
+      currentConfig.accentColor = color;
+      if (labelAccent) labelAccent.textContent = color;
+      player.setAccentColor(color);
+      if (wcElement) wcElement.setAttribute('accent-color', color);
+      log(`Accent color set to ${color}`);
+      updateCodeSnippet();
+    }
+
+    swatches.forEach((sw) => {
+      sw.addEventListener('click', () => {
+        swatches.forEach((s) => s.classList.remove('active'));
+        sw.classList.add('active');
+        const color = sw.getAttribute('data-color');
+        if (colorPicker) colorPicker.value = color;
+        applyAccentColor(color);
+      });
+    });
+
+    if (colorPicker) {
+      colorPicker.addEventListener('input', (e) => {
+        swatches.forEach((s) => s.classList.remove('active'));
+        applyAccentColor(e.target.value);
+      });
+    }
+
+    radiusPills.forEach((p) => {
+      p.addEventListener('click', () => {
+        radiusPills.forEach((x) => x.classList.remove('active'));
+        p.classList.add('active');
+        const r = Number(p.getAttribute('data-radius'));
+        currentConfig.radius = r;
+        player.setRadius(r);
+        if (wcElement) wcElement.setAttribute('radius', String(r));
+        log(`Corner radius set to ${r}px`);
+        updateCodeSnippet();
+      });
+    });
+
+    trackPills.forEach((p) => {
+      p.addEventListener('click', () => {
+        trackPills.forEach((x) => x.classList.remove('active'));
+        p.classList.add('active');
+        const h = Number(p.getAttribute('data-height'));
+        currentConfig.trackHeight = h;
+        player.setTrackHeight(h);
+        log(`Seeker track set to ${h}px`);
+        updateCodeSnippet();
+      });
+    });
+
+    // Logo Watermark
+    const checkLogo = document.getElementById('check-enable-logo');
+    const selectLogoPos = document.getElementById('select-logo-pos');
+    const rangeLogoOpacity = document.getElementById('range-logo-opacity');
+    const labelLogoOpacity = document.getElementById('label-logo-opacity');
+
+    function syncLogo() {
+      if (!checkLogo.checked) {
+        currentConfig.logo = null;
+        player.setLogo(null);
+        log('Branding logo watermark hidden');
+      } else {
+        const opacity = Number(rangeLogoOpacity.value) / 100;
+        currentConfig.logo = {
+          src: defaultLogoUrl,
+          position: selectLogoPos.value,
+          opacity
+        };
+        player.setLogo(currentConfig.logo);
+        log(`Logo updated (Pos: ${selectLogoPos.value}, Opacity: ${Math.round(opacity * 100)}%)`);
+      }
+      updateCodeSnippet();
+    }
+
+    checkLogo.addEventListener('change', syncLogo);
+    selectLogoPos.addEventListener('change', syncLogo);
+    rangeLogoOpacity.addEventListener('input', (e) => {
+      labelLogoOpacity.textContent = `${e.target.value}%`;
+      syncLogo();
+    });
+
+    // Control Toggles
+    const ctrlToggles = document.querySelectorAll('.ctrl-toggle');
+    ctrlToggles.forEach((cb) => {
+      cb.addEventListener('change', () => {
+        const ctrl = cb.getAttribute('data-control');
+        player.setControlVisibility(ctrl, cb.checked);
+        log(`Control "${ctrl}" visibility: ${cb.checked ? 'Visible' : 'Hidden'}`);
+      });
+    });
+
+    // 9. Synchronized Code Generator
+    let activeCodeTab = 'preset';
+    const codeSnippetPre = document.getElementById('code-snippet-pre');
+    const codeTabButtons = document.querySelectorAll('.code-tab-btn');
+
+    codeTabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        codeTabButtons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCodeTab = btn.getAttribute('data-tab');
+        updateCodeSnippet();
+      });
+    });
+
+    function updateCodeSnippet() {
+      const vid = player._currentVideoId || 'dQw4w9WgXcQ';
+      let code = '';
+
+      if (activeCodeTab === 'preset') {
+        code = `// 1-Line Production UI Preset (Recommended)
+import { createPlayer } from '@researchertizar/cyp-player';
+import '@researchertizar/cyp-player/dist/player.css';
+
+const player = createPlayer({
+  element: '#player-container',
+  url: '${vid}',
+  preset: '${currentConfig.preset || 'glass'}', // 'glass' | 'minimal' | 'professional' | 'cyber' | 'cinema' | 'dark'
+  lazy: true
+});`;
+      } else if (activeCodeTab === 'granular') {
+        code = `// Granular Custom Configuration
+import { createPlayer, resumePlugin, keyboardPlugin } from '@researchertizar/cyp-player';
+import '@researchertizar/cyp-player/dist/player.css';
+
+const player = createPlayer({
+  element: '#player-container',
+  url: '${vid}',
+  theme: '${currentConfig.theme}',
+  accentColor: '${currentConfig.accentColor}',
+  radius: ${currentConfig.radius},
+  trackHeight: ${currentConfig.trackHeight},
+  lazy: true,
+  logo: ${currentConfig.logo ? JSON.stringify(currentConfig.logo, null, 2).replace(/\n/g, '\n  ') : 'null'},
+  plugins: [
+    resumePlugin(),
+    keyboardPlugin()
+  ]
+});`;
+      } else if (activeCodeTab === 'react') {
+        code = `// React / Next.js Implementation
+import React, { useEffect, useRef } from 'react';
+import { createPlayer } from '@researchertizar/cyp-player';
+import '@researchertizar/cyp-player/dist/player.css';
+
+export function VideoComponent() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const player = createPlayer({
+      element: containerRef.current,
+      url: '${vid}',
+      preset: '${currentConfig.preset}',
+      lazy: true
+    });
+    return () => player.destroy();
+  }, []);
+
+  return <div ref={containerRef} style={{ width: '100%', aspectRatio: '16/9' }} />;
+}`;
+      } else if (activeCodeTab === 'wc') {
+        code = `<!-- Autonomous Web Component -->
+<script type="module" src="https://unpkg.com/@researchertizar/cyp-player/dist/player.es.js"><\/script>
+<link rel="stylesheet" href="https://unpkg.com/@researchertizar/cyp-player/dist/player.css">
+
+<!-- Direct video file or YouTube stream -->
+<custom-video-player 
+  src="${vid}" 
+  preset="${currentConfig.preset}"
+  accent-color="${currentConfig.accentColor}"
+  radius="${currentConfig.radius}"
+  lazy="true">
+</custom-video-player>`;
+      }
+
+      codeSnippetPre.textContent = code;
+    }
+    updateCodeSnippet();
+
+    document.getElementById('btn-copy-code').addEventListener('click', () => {
+      navigator.clipboard.writeText(codeSnippetPre.textContent).then(() => {
+        const btn = document.getElementById('btn-copy-code');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Code'; }, 1500);
+      });
+    });
+
+    document.getElementById('btn-copy-install').addEventListener('click', () => {
+      navigator.clipboard.writeText('npm i @researchertizar/cyp-player').then(() => {
+        const span = document.getElementById('install-text');
+        span.textContent = 'Copied to clipboard!';
+        setTimeout(() => { span.textContent = 'npm i @researchertizar/cyp-player'; }, 1800);
+      });
+    });
+
+    // 10. Developer Guide Tabs Navigation
+    const guideTabBtns = document.querySelectorAll('.guide-tab-nav-btn');
+    const guidePanels = document.querySelectorAll('.guide-panel');
+
+    guideTabBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        guideTabBtns.forEach((b) => b.classList.remove('active'));
+        guidePanels.forEach((p) => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-panel');
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) targetPanel.classList.add('active');
+      });
+    });
+
+    // 11. Mobile Navigation Menu Toggle
+    const btnMobileMenu = document.getElementById('btn-mobile-menu');
+    const mobileNavMenu = document.getElementById('mobile-nav-menu');
+    const iconMobileMenu = document.getElementById('icon-mobile-menu');
+
+    if (btnMobileMenu && mobileNavMenu) {
+      btnMobileMenu.addEventListener('click', () => {
+        const isOpen = mobileNavMenu.classList.toggle('is-open');
+        btnMobileMenu.setAttribute('aria-expanded', String(isOpen));
+        if (isOpen) {
+          iconMobileMenu.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+        } else {
+          iconMobileMenu.innerHTML = '<line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+        }
+      });
+
+      mobileNavMenu.querySelectorAll('.mobile-nav-link').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileNavMenu.classList.remove('is-open');
+          btnMobileMenu.setAttribute('aria-expanded', 'false');
+          iconMobileMenu.innerHTML = '<line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+        });
+      });
+    }
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,695 @@
+/* ==========================================================================
+   Custom YouTube Player - Controls, Timeline, and Overlays
+   ========================================================================== */
+
+/* Top Gradient Header */
+.cyp-top-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent);
+  pointer-events: none;
+  z-index: 4;
+  padding: 16px 20px;
+  transition: opacity var(--cyp-transition);
+}
+
+.cyp-title {
+  color: var(--cyp-text);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  max-width: 80%;
+}
+
+/* Bottom Controls Wrapper */
+.cyp-controls-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  padding: 40px 14px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.4) 60%, transparent);
+  transition: opacity var(--cyp-transition);
+}
+
+/* ==========================================================================
+   Timeline Scrubber
+   ========================================================================== */
+
+.cyp-timeline {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 6px;
+  outline: none;
+}
+
+.cyp-timeline-track {
+  position: relative;
+  width: 100%;
+  height: var(--cyp-track-height);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  transition: height 120ms ease;
+}
+
+.cyp-timeline:hover .cyp-timeline-track,
+.cyp-timeline.is-scrubbing .cyp-timeline-track {
+  height: var(--cyp-track-height-hover);
+}
+
+.cyp-timeline-buffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: inherit;
+}
+
+.cyp-timeline-played {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--cyp-accent);
+  border-radius: inherit;
+}
+
+.cyp-timeline-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cyp-timeline-marker {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 2;
+}
+
+.cyp-timeline-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: var(--cyp-thumb-size);
+  height: var(--cyp-thumb-size);
+  border-radius: 50%;
+  background: var(--cyp-accent);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 120ms ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+}
+
+.cyp-timeline:hover .cyp-timeline-thumb,
+.cyp-timeline.is-scrubbing .cyp-timeline-thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.cyp-timeline-tooltip {
+  position: absolute;
+  bottom: 26px;
+  left: 0;
+  transform: translateX(-50%);
+  background: rgba(18, 18, 18, 0.95);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.cyp-timeline:hover .cyp-timeline-tooltip {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Control Row & Buttons
+   ========================================================================== */
+
+.cyp-control-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 42px;
+}
+
+.cyp-controls-left,
+.cyp-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cyp-spacer {
+  flex: 1;
+}
+
+.cyp-btn {
+  width: var(--cyp-control-size);
+  height: var(--cyp-control-size);
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--cyp-text);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--cyp-transition), color var(--cyp-transition), transform 100ms;
+}
+
+.cyp-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.cyp-btn:active {
+  transform: scale(0.92);
+}
+
+.cyp-btn.is-active,
+.cyp-captions-btn.is-active {
+  color: var(--cyp-accent);
+  position: relative;
+}
+
+.cyp-btn.is-active::after,
+.cyp-captions-btn.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 20%;
+  right: 20%;
+  height: 2.5px;
+  background: var(--cyp-accent);
+  border-radius: 2px;
+}
+
+.cyp-btn svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Volume Slider */
+.cyp-volume-group {
+  display: flex;
+  align-items: center;
+}
+
+.cyp-volume-slider {
+  width: 65px;
+  height: 4px;
+  accent-color: var(--cyp-accent);
+  cursor: pointer;
+  margin-left: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+/* Time Display */
+.cyp-time-display {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--cyp-text-secondary);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Settings Menu Popup (Hierarchical, Accessible, Minimal)
+   ========================================================================== */
+
+.cyp-settings-wrapper {
+  position: relative;
+}
+
+.cyp-settings-menu {
+  position: absolute;
+  right: 0;
+  bottom: 48px;
+  width: 215px;
+  background: rgba(18, 18, 20, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 25;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cyp-settings-menu.is-open {
+  display: flex;
+}
+
+/* Menu Views (Smooth Transitions) */
+.cyp-menu-view {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.cyp-menu-view.is-active {
+  display: flex;
+  animation: cypMenuSlide 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cypMenuSlide {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Root Navigation Buttons */
+.cyp-menu-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  color: var(--cyp-text);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms ease;
+  outline: none;
+}
+
+.cyp-menu-nav-btn:hover,
+.cyp-menu-nav-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cyp-nav-left {
+  font-size: 13px;
+  color: var(--cyp-text);
+}
+
+.cyp-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cyp-text-secondary);
+  font-size: 12px;
+}
+
+.cyp-nav-val {
+  font-size: 12px;
+  color: var(--cyp-text-secondary);
+  max-width: 85px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cyp-nav-chevron {
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+}
+
+/* Submenu Back Navigation */
+.cyp-menu-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  margin-bottom: 4px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: var(--cyp-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: background 120ms ease;
+  outline: none;
+}
+
+.cyp-menu-back-btn:hover,
+.cyp-menu-back-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cyp-back-arrow {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--cyp-text-secondary);
+}
+
+.cyp-back-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cyp-text);
+  letter-spacing: 0.3px;
+}
+
+/* Menu Option Lists & Sleek Custom Scrollbar */
+.cyp-menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 195px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  padding-right: 2px;
+}
+
+.cyp-menu-options::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cyp-menu-options::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cyp-menu-options::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.cyp-menu-options::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Menu Items (Radio options) */
+.cyp-menu-item {
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: 0;
+  color: var(--cyp-text);
+  font-size: 13px;
+  text-align: left;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 120ms ease, color 120ms ease;
+  outline: none;
+}
+
+.cyp-menu-item:hover,
+.cyp-menu-item:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cyp-menu-item.is-active {
+  color: var(--cyp-accent);
+  font-weight: 600;
+}
+
+.cyp-item-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cyp-item-check {
+  display: none;
+  align-items: center;
+  color: var(--cyp-accent);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.cyp-menu-item.is-active .cyp-item-check {
+  display: flex;
+}
+
+/* ==========================================================================
+   Center Play & Loader
+   ========================================================================== */
+
+.cyp-center-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: transform var(--cyp-transition), background var(--cyp-transition), opacity var(--cyp-transition);
+  padding: 0 0 0 4px;
+}
+
+.cyp-center-play svg {
+  width: 36px;
+  height: 36px;
+}
+
+.cyp-center-play:hover {
+  background: var(--cyp-accent);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.cyp-center-play.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Loader */
+.cyp-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--cyp-accent);
+  border-radius: 50%;
+  animation: cyp-spin 0.75s linear infinite;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--cyp-transition);
+}
+
+.cyp-loader.is-visible {
+  opacity: 1;
+}
+
+@keyframes cyp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Toast Notification & Error Overlay
+   ========================================================================== */
+
+.cyp-toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 6;
+  transition: opacity 160ms, transform 160ms;
+  backdrop-filter: blur(8px);
+}
+
+.cyp-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Error Overlay */
+.cyp-error-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, #222, #080808);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  z-index: 6;
+}
+
+.cyp-error-overlay.is-visible {
+  display: flex;
+}
+
+.cyp-error-overlay h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: #fff;
+}
+
+.cyp-error-overlay p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cyp-text-secondary);
+}
+
+/* ==========================================================================
+   Mobile Responsive Tweaks
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .cyp-player {
+    border-radius: 0;
+  }
+
+  .cyp-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cyp-volume-slider {
+    display: none;
+  }
+
+  .cyp-center-play {
+    width: 58px;
+    height: 58px;
+  }
+
+  .cyp-center-play svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+
+/* ==========================================================================
+   Chapters Drawer Component
+   ========================================================================== */
+
+.cyp-chapters-drawer {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 60px;
+  background: rgba(18, 18, 18, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px;
+  display: none;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.cyp-chapters-drawer.is-open {
+  display: block;
+}
+
+.cyp-chapters-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  padding-bottom: 2px;
+}
+
+.cyp-chapters-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.cyp-chapters-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cyp-chapters-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.cyp-chapters-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.cyp-chapter-pill {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 0;
+  border-radius: 6px;
+  color: var(--cyp-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--cyp-transition), color var(--cyp-transition);
+}
+
+.cyp-chapter-pill:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.cyp-chapter-pill.is-active {
+  background: var(--cyp-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.cyp-chap-time {
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
