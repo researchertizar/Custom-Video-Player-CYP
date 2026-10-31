@@ -27,6 +27,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:demo": "node scripts/build-demo.js",
     "test": "vitest run",
     "preview": "vite preview"
   },
