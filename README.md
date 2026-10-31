@@ -4,7 +4,7 @@ Universal, zero-dependency video player engine and Autonomous Web Component for 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![NPM Version](https://img.shields.io/badge/npm-%40researcher--tizar%2Fcyp--player-red.svg)](https://www.npmjs.com/package/@researcher-tizar/cyp-player)
-[![Tests: 51 Passed](https://img.shields.io/badge/Tests-51%20Passed-brightgreen.svg)]()
+[![Tests: 60 Passed](https://img.shields.io/badge/Tests-60%20Passed-brightgreen.svg)]()
 [![TypeScript: Included](https://img.shields.io/badge/TypeScript-Types%20Included-3178c6.svg)](index.d.ts)
 [![Bundle Size](https://img.shields.io/badge/Bundle%20Size-~24KB%20gzip-success.svg)]()
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0%20Runtime-blueviolet.svg)]()
@@ -27,6 +27,7 @@ Universal, zero-dependency video player engine and Autonomous Web Component for 
 - [Stream Link Shielding](#stream-link-shielding)
   - [Click Interception](#click-interception)
   - [Stream Tokens](#stream-tokens)
+- [Security Model](#security-model)
 - [Picture-in-Picture and Mini-Player](#picture-in-picture-and-mini-player)
 - [UI Presets and Customization](#ui-presets-and-customization)
   - [Available Presets](#available-presets)
@@ -57,6 +58,8 @@ Custom Video Player (CYP) provides a unified media controller that abstracts the
 
 - Unified API: Single set of methods, events, and configuration options across HTML5 video and YouTube streams.
 - Zero Runtime Dependencies: Built entirely with vanilla JavaScript and CSS custom properties; production bundle is ~24 KB minified and gzipped.
+- Input & Protocol Sanitization: Strict scheme validation neutralizes `javascript:` and dangerous data URI injection in media URLs, poster frames, and watermark badges.
+- Token Recursion Guard: Call stack depth bounds prevent recursion-based Denial of Service (DoS) attacks on obfuscated stream tokens.
 - Stream Link Shielding: Transparent interaction layer prevents context menus and direct clicks from navigating away to third-party platforms.
 - Stream Tokens: Base64 token generation utility allows passing obfuscated media identifiers instead of exposing raw URLs in the client DOM.
 - Progressive Disclosure: Controls for quality, closed captions, and chapters automatically hide when unsupported by the current source.
@@ -230,6 +233,18 @@ player.load('b64:ZFF3NHc5V2dYY1E/dD00NQ==');
 ```
 
 The player decodes the token in memory at runtime without exposing the target URL in the DOM.
+
+---
+
+## Security Model
+
+Custom Video Player (CYP) is built for secure multi-tenant and public-facing applications:
+
+- Zero Runtime Dependencies: Eliminates supply chain attack vectors. No third-party npm packages execute in client browsers.
+- URL Scheme Allowlisting: All dynamic resource properties (`poster`, `logo.src`, `logo.url`) pass through `sanitizeUrl()`. Only explicit safe schemes (`https:`, `http:`, `blob:`, `data:image/`) and relative paths are permitted. Unsafe schemes (`javascript:`, `vbscript:`, `data:text/html`) are neutralized automatically.
+- Token Recursion Guard: Obfuscated token parsing includes recursion depth bounds (`depth <= 5`) to prevent stack overflow Denial of Service (DoS) attacks from cyclic or deeply nested payloads.
+- DOM Safety: Logo overlays and title text elements enforce strict validation, rejecting unescaped script tags and inline DOM event attributes.
+- YouTube IFrame Isolation: Uses privacy-enhanced `youtube-nocookie.com` host by default and configures origin parameters for postMessage communications.
 
 ---
 
@@ -465,6 +480,33 @@ player.on('timeupdate', (seconds) => { /* Current playback position */ });
 player.on('volumechange', ({ volume, muted }) => { /* Volume or mute update */ });
 player.on('change:playbackRate', (rate) => { /* Speed changed */ });
 player.on('error', (error) => { /* Playback or provider error */ });
+```
+
+### Helper & Security Utilities
+
+CYP exports utility functions for safe integration in web applications:
+
+```javascript
+import {
+  sanitizeUrl,
+  escapeHtml,
+  encodeStreamToken,
+  decodeStreamToken,
+  parseYouTubeUrl,
+  formatTime
+} from '@researcher-tizar/cyp-player';
+
+// Strip dangerous protocols (javascript:, vbscript:, data:text/html)
+const safeUrl = sanitizeUrl(untrustedUrl);
+
+// Escape HTML entities (&, <, >, ", ')
+const safeHtml = escapeHtml(untrustedText);
+
+// Encode a stream token to hide raw URLs from client DOM
+const token = encodeStreamToken('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+// Format seconds into MM:SS or HH:MM:SS
+const timeString = formatTime(125); // "02:05"
 ```
 
 ---

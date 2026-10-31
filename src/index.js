@@ -19,6 +19,7 @@ import { gesturesPlugin } from './plugins/gestures.js';
 import { CustomYouTubePlayerElement, CustomVideoPlayerElement } from './web-component.js';
 import { parseYouTubeUrl, isValidVideoId, encodeStreamToken, decodeStreamToken } from './utils/youtube-url.js';
 import { formatTime, parseTime } from './utils/time.js';
+import { sanitizeUrl, escapeHtml } from './utils/dom.js';
 import { PlayerError, ErrorCode } from './core/errors.js';
 import { PlayerPresets } from './core/presets.js';
 
@@ -52,6 +53,8 @@ export const CustomYouTubePlayer = {
   decodeStreamToken,
   formatTime,
   parseTime,
+  sanitizeUrl,
+  escapeHtml,
   PlayerError,
   ErrorCode,
   Icons,
@@ -79,6 +82,8 @@ export {
   decodeStreamToken,
   formatTime,
   parseTime,
+  sanitizeUrl,
+  escapeHtml,
   PlayerError,
   ErrorCode,
   Icons,

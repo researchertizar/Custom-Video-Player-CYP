@@ -47,6 +47,7 @@ describe('Library Build Artifacts', () => {
     expect(content).toContain('export const PlayerPresets');
     expect(content).toContain('export type PresetId');
     expect(content).toContain('export interface PlayerOptions');
+    expect(content).toContain('export function sanitizeUrl');
   });
 });
 

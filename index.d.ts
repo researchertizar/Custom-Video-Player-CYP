@@ -248,7 +248,9 @@ export class CustomYouTubePlayerElement extends HTMLElement {
 export class CustomVideoPlayerElement extends CustomYouTubePlayerElement {}
 
 /** Utilities */
-export function parseYouTubeUrl(input: string): { videoId: string | null; startTime: number | null };
+export function sanitizeUrl(url: string): string;
+export function escapeHtml(str: string): string;
+export function parseYouTubeUrl(input: string, depth?: number): { videoId: string | null; startTime: number | null };
 export function isValidVideoId(id: string): boolean;
 export function encodeStreamToken(videoId: string, timestamp?: number): string;
 export function decodeStreamToken(token: string): { videoId: string; timestamp?: number } | null;
@@ -273,6 +275,8 @@ export const CustomYouTubePlayer: {
   decodeStreamToken: typeof decodeStreamToken;
   formatTime: typeof formatTime;
   parseTime: typeof parseTime;
+  sanitizeUrl: typeof sanitizeUrl;
+  escapeHtml: typeof escapeHtml;
 };
 
 export const CustomVideoPlayer: typeof CustomYouTubePlayer;
