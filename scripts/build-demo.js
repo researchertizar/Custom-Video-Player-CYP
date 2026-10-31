@@ -19,3 +19,4 @@ if (fs.existsSync(demoHtml)) {
 } else {
   console.warn('Warning: dist-demo/demo/index.html not found.');
 }
+

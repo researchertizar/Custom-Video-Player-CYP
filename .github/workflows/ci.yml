@@ -28,11 +28,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Test Suite
-        run: npm test
-
       - name: Build Production Assets
         run: npm run build
+
+      - name: Run Test Suite
+        run: npm test
 
       - name: Verify Package Dry Run
         run: npm pack --dry-run

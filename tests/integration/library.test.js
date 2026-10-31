@@ -1,9 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { beforeAll, describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
+import { execSync } from 'child_process';
 
 describe('Library Build Artifacts', () => {
   const distDir = resolve(__dirname, '../../dist');
+
+  beforeAll(() => {
+    const esFile = resolve(distDir, 'player.es.js');
+    if (!existsSync(esFile)) {
+      execSync('npm run build', { cwd: resolve(__dirname, '../..') });
+    }
+  });
 
   it('generates player.es.js with non-empty content', () => {
     const esFile = resolve(distDir, 'player.es.js');
