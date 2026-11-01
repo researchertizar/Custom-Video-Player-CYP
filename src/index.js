@@ -3,9 +3,6 @@
  * Zero-runtime-dependency universal video player engine for HTML5 and YouTube.
  */
 
-import '../styles/player.css';
-import '../styles/controls.css';
-import '../styles/themes.css';
 
 import { Player } from './core/player.js';
 import { Provider } from './providers/provider.js';

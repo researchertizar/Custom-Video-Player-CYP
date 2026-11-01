@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.js'),
+      entry: resolve(__dirname, 'src/bundle.js'),
       name: 'CustomYouTubePlayer',
       formats: ['es', 'umd'],
       fileName: (format) => `player.${format}.js`
