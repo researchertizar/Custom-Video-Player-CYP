@@ -61,7 +61,16 @@ export class YouTubeProvider extends Provider {
    * @returns {Promise<void>}
    */
   async init(container, videoId, options = {}) {
+    if (this._yt) {
+      this.destroy();
+    }
     this._container = container;
+    if (this._container && typeof this._container.querySelectorAll === 'function') {
+      const existing = this._container.querySelectorAll('.cyp-iframe-target, iframe');
+      existing.forEach((el) => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
+    }
     await youtubeLoader.load();
 
     return new Promise((resolve, reject) => {

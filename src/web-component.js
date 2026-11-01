@@ -43,6 +43,7 @@ export class CustomYouTubePlayerElement extends HTMLElement {
       this.getAttribute('url') ||
       this.getAttribute('src') ||
       '';
+    const mode = this.getAttribute('mode') || (this.hasAttribute('strict-compliance') ? 'compliant' : 'enhanced');
     const preset = this.getAttribute('preset');
     const theme = this.getAttribute('theme') || 'dark';
     const autoplay = this.hasAttribute('autoplay');
@@ -65,6 +66,7 @@ export class CustomYouTubePlayerElement extends HTMLElement {
       element: this,
       videoId: target,
       preset,
+      mode,
       theme,
       autoplay,
       lazy,

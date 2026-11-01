@@ -32,7 +32,7 @@ npm install @researcher-tizar/cyp-player
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@researcher-tizar/cyp-player/dist/player.css">
 
 <!-- HTML5 Video -->
-<custom-video-player src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" theme="cinematic"></custom-video-player>
+<custom-video-player src="https://vjs.zencdn.net/v/oceans.mp4" theme="cinematic"></custom-video-player>
 
 <!-- YouTube Stream -->
 <custom-video-player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" theme="cyberpunk"></custom-video-player>

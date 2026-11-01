@@ -20,9 +20,9 @@ describe('source-detector', () => {
   });
 
   it('detects direct MP4 and WebM video files as html5', () => {
-    const res1 = detectSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+    const res1 = detectSource('https://vjs.zencdn.net/v/oceans.mp4');
     expect(res1.type).toBe('html5');
-    expect(res1.target).toContain('BigBuckBunny.mp4');
+    expect(res1.target).toContain('oceans.mp4');
 
     const res2 = detectSource('./videos/demo.webm');
     expect(res2.type).toBe('html5');

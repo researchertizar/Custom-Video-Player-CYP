@@ -6,100 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Custom Video Player (CYP) — Production Universal Video Engine</title>
 
-  <!-- Primary Search Engine SEO & Discoverability -->
-  <meta name="description" content="Custom Video Player (CYP) is a zero-dependency autonomous Web Component reconciling native HTML5 video and YouTube streams under a unified dark-glass UI with link shielding.">
-  <meta name="keywords" content="custom video player, web component, html5 video player, youtube custom player, zero dependency player, cyp player, video player library, lightweight video player, vanillajs video player, @researcher-tizar/cyp-player">
-  <meta name="author" content="researcher-tizar">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://researchertizar.github.io/Custom-Video-Player-CYP/">
-
-  <!-- Open Graph / WhatsApp / Discord / LinkedIn -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Custom Video Player (CYP)">
-  <meta property="og:url" content="https://researchertizar.github.io/Custom-Video-Player-CYP/">
-  <meta property="og:title" content="Custom Video Player (CYP) — Universal Web Component Video Engine">
-  <meta property="og:description" content="Zero runtime dependencies (~26.8KB gzip). Unifies HTML5 and YouTube playback behind custom presets, stream link shielding, and keyboard navigation.">
-  <meta property="og:image" content="https://researchertizar.github.io/Custom-Video-Player-CYP/assets/og-preview.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Custom Video Player CYP Interface Showcase">
-
-  <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://researchertizar.github.io/Custom-Video-Player-CYP/">
-  <meta name="twitter:title" content="Custom Video Player (CYP) — Universal Web Component Video Engine">
-  <meta name="twitter:description" content="Zero dependencies (~26.8KB gzip). Native HTML5 + YouTube unified engine with custom dark glass presets and DOM security hardening.">
-  <meta name="twitter:image" content="https://researchertizar.github.io/Custom-Video-Player-CYP/assets/og-preview.png">
-  <meta name="twitter:creator" content="@researchertizar">
-
-  <!-- Generative Engine Optimization (GEO) Structured Data (JSON-LD) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        "name": "Custom Video Player (CYP)",
-        "applicationCategory": "MultimediaApplication",
-        "operatingSystem": "Web Browsers",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "description": "Modern, zero-dependency universal custom video player for HTML5 and YouTube with stream link shielding, UI models, and web components.",
-        "softwareVersion": "0.1.0",
-        "fileSize": "~26.8KB gzip",
-        "url": "https://researchertizar.github.io/Custom-Video-Player-CYP/",
-        "author": {
-          "@type": "Person",
-          "name": "researcher-tizar",
-          "url": "https://ahayas-portfolio.vercel.app"
-        }
-      },
-      {
-        "@type": "SoftwareSourceCode",
-        "name": "@researcher-tizar/cyp-player",
-        "programmingLanguage": "JavaScript",
-        "runtimePlatform": "Web Components",
-        "codeRepository": "https://github.com/researchertizar/Custom-Video-Player-CYP",
-        "license": "https://opensource.org/licenses/MIT",
-        "version": "0.1.0"
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is Custom Video Player (CYP)?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "CYP is an open-source, zero-dependency media player library built with autonomous Web Components. It unifies native HTML5 MP4/WebM video and YouTube streams under a single declarative tag with customizable dark-glass themes and stream shielding."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How does CYP compare to Video.js or Plyr?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Unlike Video.js which exceeds 200KB and requires external framework dependencies, CYP has zero runtime dependencies, ships at ~24KB gzipped, and natively isolates YouTube traffic leakage using stream link shielding."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How do I install Custom Video Player?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Install via npm: npm install @researcher-tizar/cyp-player or load directly from CDN via jsDelivr or unpkg."
-            }
-          }
-        ]
-      }
-    ]
-  }
-  </script>
-  <!-- /SEO Block -->
-
   <!-- Player Library Stylesheets & Favicon -->
   <link rel="stylesheet" href="../styles/player.css">
   <link rel="stylesheet" href="../styles/controls.css">
@@ -1552,14 +1458,14 @@
           <button class="chip-btn active" data-id="dQw4w9WgXcQ" data-start="0">
             YouTube (Rick Astley CC)
           </button>
-          <button class="chip-btn" data-id="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" data-start="0">
-            HTML5 (Big Buck Bunny MP4)
+          <button class="chip-btn" data-id="https://vjs.zencdn.net/v/oceans.mp4" data-start="0">
+            HTML5 (Oceans MP4)
           </button>
           <button class="chip-btn" data-id="b64:ZFF3NHc5V2dYY1E/dD0w" data-start="0">
             Shielded Token (b64:...)
           </button>
-          <button class="chip-btn" data-id="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" data-start="0">
-            HTML5 (Tears of Steel MP4)
+          <button class="chip-btn" data-id="https://media.w3.org/2010/05/sintel/trailer.mp4" data-start="0">
+            HTML5 (Sintel Trailer MP4)
           </button>
           <button class="chip-btn" data-id="L_LUpnjgPso" data-start="80">
             YouTube (Starts @ 1m20s)
@@ -1607,6 +1513,12 @@
           <select id="select-quality-studio" class="target-select" style="padding:4px 8px; font-size:0.75rem;">
             <option value="auto">Auto</option>
           </select>
+        </div>
+
+        <div class="toolbar-group">
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Mode:</span>
+          <button id="btn-mode-enhanced" class="toolbar-btn active" title="Enhanced Studio Mode: Active Click Interceptor & Smart Ad Passthrough">Enhanced</button>
+          <button id="btn-mode-compliant" class="toolbar-btn" title="Strict YouTube Policy Compliant Mode: Direct iframe pass-through">Compliant</button>
         </div>
 
         <div class="toolbar-group" style="margin-left:auto;">
@@ -2429,6 +2341,24 @@ player.use(analyticsPlugin());</code></pre>
     document.getElementById('btn-seek-60').addEventListener('click', () => player.seekTo(60));
     document.getElementById('btn-mute').addEventListener('click', () => player.toggleMute());
     document.getElementById('btn-fullscreen-toggle').addEventListener('click', () => player.events.emit('ui:toggle-fullscreen'));
+
+    // Dual-Mode Controls
+    const btnModeEnhanced = document.getElementById('btn-mode-enhanced');
+    const btnModeCompliant = document.getElementById('btn-mode-compliant');
+
+    btnModeEnhanced.addEventListener('click', () => {
+      player.setMode('enhanced');
+      btnModeEnhanced.classList.add('active');
+      btnModeCompliant.classList.remove('active');
+      log('Active Mode: Enhanced (Click Interceptor & Smart Ad Passthrough enabled)', 'event');
+    });
+
+    btnModeCompliant.addEventListener('click', () => {
+      player.setMode('compliant');
+      btnModeCompliant.classList.add('active');
+      btnModeEnhanced.classList.remove('active');
+      log('Active Mode: YouTube Policy Compliant (Direct iframe interaction enabled)', 'event');
+    });
 
     // Speed Toolbar Buttons
     const speedButtons = [

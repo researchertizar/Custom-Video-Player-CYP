@@ -51,6 +51,10 @@ export interface PlayerOptions {
   provider?: 'youtube' | 'html5' | 'auto';
   /** UI Design Preset ('glass' | 'minimal' | 'professional' | 'cyber' | 'cinema' | 'dark') */
   preset?: PresetId;
+  /** Interaction & compliance mode: 'enhanced' (distraction-free studio) | 'compliant' (strict YouTube guidelines) */
+  mode?: 'enhanced' | 'compliant';
+  /** Alternative shorthand for mode: 'compliant' */
+  strictCompliance?: boolean;
   /** Visual Theme */
   theme?: ThemeId;
   /** Custom accent highlight color (hex/rgb) */
@@ -80,6 +84,15 @@ export class Player {
   constructor(options: PlayerOptions);
 
   /** Mounts underlying video player */
+  /** Interaction mode ('enhanced' | 'compliant') */
+  readonly mode: 'enhanced' | 'compliant';
+  /** Changes interaction mode dynamically */
+  setMode(mode: 'enhanced' | 'compliant'): void;
+  /** Whether strict YouTube compliance mode is active */
+  isCompliant(): boolean;
+  /** Whether enhanced distraction-free mode is active */
+  isEnhanced(): boolean;
+
   mount(): Promise<Player>;
 
   /** Starts playback */

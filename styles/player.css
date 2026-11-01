@@ -95,6 +95,35 @@ custom-video-player {
   pointer-events: none !important;
 }
 
+/* Dual-Mode Interaction Model */
+/* Mode 1: Enhanced Mode (Default) - Active Click Interceptor & Smart Ad Passthrough */
+.cyp-player.mode-enhanced .cyp-click-interceptor {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.cyp-player.mode-enhanced .cyp-click-interceptor.pass-through {
+  pointer-events: none !important;
+}
+
+.cyp-player.mode-enhanced .cyp-iframe-wrapper.is-ad-active {
+  pointer-events: auto !important;
+  z-index: 5;
+}
+
+/* Mode 2: YouTube Compliant Mode - Pass-through to iframe for full policy alignment */
+.cyp-player.mode-compliant.provider-youtube .cyp-click-interceptor {
+  pointer-events: none !important;
+}
+
+.cyp-player.mode-compliant.provider-youtube .cyp-iframe-wrapper {
+  pointer-events: auto !important;
+}
+
+
 /* Poster / Lazy Facade */
 .cyp-poster {
   position: absolute;

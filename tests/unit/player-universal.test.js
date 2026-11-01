@@ -59,7 +59,7 @@ describe('Player Universal Support', () => {
   it('initializes HTML5 provider when given an MP4 URL', async () => {
     player = new Player({
       element: container,
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      url: 'https://vjs.zencdn.net/v/oceans.mp4',
       lazy: false
     });
 
@@ -92,5 +92,88 @@ describe('Player Universal Support', () => {
     expect(player._providerType).toBe('html5');
     const video = container.querySelector('video');
     expect(video).not.toBeNull();
+  });
+
+  it('initializes with enhanced mode by default and supports compliant mode', async () => {
+    player = new Player({
+      element: container,
+      videoId: 'dQw4w9WgXcQ',
+      lazy: false
+    });
+
+    expect(player.mode).toBe('enhanced');
+    expect(player.isEnhanced()).toBe(true);
+    expect(player.isCompliant()).toBe(false);
+    expect(container.classList.contains('mode-enhanced')).toBe(true);
+
+    // Switch to compliant mode dynamically
+    let modeChanged = false;
+    player.events.on('change:mode', (m) => {
+      modeChanged = m === 'compliant';
+    });
+    player.setMode('compliant');
+
+    expect(player.mode).toBe('compliant');
+    expect(player.isCompliant()).toBe(true);
+    expect(player.isEnhanced()).toBe(false);
+    expect(container.classList.contains('mode-compliant')).toBe(true);
+    expect(modeChanged).toBe(true);
+  });
+
+  it('supports strictCompliance option at initialization', async () => {
+    player = new Player({
+      element: container,
+      videoId: 'dQw4w9WgXcQ',
+      strictCompliance: true,
+      lazy: false
+    });
+
+    expect(player.mode).toBe('compliant');
+    expect(player.isCompliant()).toBe(true);
+    expect(container.classList.contains('mode-compliant')).toBe(true);
+  });
+
+  it('swaps provider cleanly before mounting in lazy mode without throwing', async () => {
+    player = new Player({
+      element: container,
+      videoId: 'dQw4w9WgXcQ',
+      lazy: true
+    });
+
+    expect(player._isMounted).toBe(false);
+    expect(player._providerType).toBe('youtube');
+
+    // Switch to HTML5 while still unmounted
+    await player.load('https://vjs.zencdn.net/v/oceans.mp4');
+
+    expect(player._providerType).toBe('html5');
+    expect(player.provider.constructor.name).toBe('HTML5Provider');
+
+    // Now mount explicitly
+    await player.mount();
+    expect(player._isMounted).toBe(true);
+    const video = container.querySelector('video');
+    expect(video).not.toBeNull();
+  });
+
+  it('cleans up duplicate DOM elements when re-initializing or switching', async () => {
+    player = new Player({
+      element: container,
+      videoId: 'dQw4w9WgXcQ',
+      lazy: false
+    });
+    await player.mount();
+
+    expect(container.querySelectorAll('.cyp-iframe-target').length).toBe(1);
+
+    // Switch to HTML5
+    await player.load('https://vjs.zencdn.net/v/oceans.mp4');
+    expect(container.querySelectorAll('.cyp-iframe-target').length).toBe(0);
+    expect(container.querySelectorAll('video').length).toBe(1);
+
+    // Switch back to YouTube
+    await player.load('M7lc1UVf-VE');
+    expect(container.querySelectorAll('video').length).toBe(0);
+    expect(container.querySelectorAll('.cyp-iframe-target').length).toBe(1);
   });
 });

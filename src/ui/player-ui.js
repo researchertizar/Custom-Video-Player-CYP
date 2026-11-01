@@ -41,7 +41,8 @@ export class PlayerUI {
       if (this._options.trackHeight === undefined) this._options.trackHeight = p.trackHeight;
     }
 
-    this._root.classList.add('cyp-player', `theme-${this._options.theme || 'dark'}`);
+    this._mode = this._player.mode || 'enhanced';
+    this._root.classList.add('cyp-player', `theme-${this._options.theme || 'dark'}`, `mode-${this._mode}`);
 
     // Apply custom styling options
     if (this._options.accentColor) {
@@ -210,6 +211,10 @@ export class PlayerUI {
 
   _bindPlayerState() {
     // Reactive state synchronization
+    this._player.events.on('change:mode', (mode) => {
+      this.setMode(mode);
+    });
+
     this._player.events.on('change:status', (status) => {
       this._root.setAttribute('data-status', status);
 
@@ -436,6 +441,20 @@ export class PlayerUI {
    * @param {string} themeName
    * @param {boolean} [resetAccent=true]
    */
+  /**
+   * Sets interaction mode dynamically ('enhanced' | 'compliant').
+   * @param {'enhanced' | 'compliant'} mode
+   */
+  setMode(mode) {
+    if (mode !== 'compliant' && mode !== 'enhanced') return;
+    this._mode = mode;
+    this._root.classList.remove('mode-enhanced', 'mode-compliant');
+    this._root.classList.add(`mode-${mode}`);
+    if (this.controls && typeof this.controls.showToast === 'function') {
+      this.controls.showToast(mode === 'compliant' ? 'YouTube Policy Compliant Mode' : 'Enhanced Studio Mode');
+    }
+  }
+
   setTheme(themeName, resetAccent = true) {
     if (!themeName) return;
     const themeClasses = Array.from(this._root.classList).filter((c) => c.startsWith('theme-'));
@@ -484,6 +503,9 @@ export class PlayerUI {
    * @param {{ type: string, target: any }} detection
    */
   updateVideoTarget(detection) {
+    if (!this._player._isMounted) {
+      this._mountPromise = null;
+    }
     if (detection.type === 'youtube' && detection.target) {
       this.updateVideoId(detection.target);
     } else {

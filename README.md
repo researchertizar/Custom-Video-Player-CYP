@@ -116,7 +116,7 @@ Register the web component by importing the ES module:
 
 <!-- HTML5 Video -->
 <custom-video-player
-  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  src="https://vjs.zencdn.net/v/oceans.mp4"
   preset="glass"
   radius="16">
 </custom-video-player>
@@ -141,7 +141,7 @@ import '@researcher-tizar/cyp-player/dist/player.css';
 
 const player = createPlayer({
   element: '#player-container',
-  url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+  url: 'https://vjs.zencdn.net/v/oceans.mp4',
   preset: 'dark',
   accentColor: '#e50914',
   autoplay: false
@@ -151,6 +151,41 @@ player.on('playing', () => {
   console.log('Playback started');
 });
 ```
+
+---
+
+---
+
+## Dual-Mode Architecture: Enhanced vs. Compliant
+
+CYP offers an architectural dual-mode engine allowing developers to toggle between an uninterrupted, distraction-free custom UI model and strict platform policy alignment:
+
+```javascript
+// Mode 1: Enhanced (Default) - Seamless distraction-free studio experience
+const player = createPlayer({
+  element: '#player',
+  videoId: 'dQw4w9WgXcQ',
+  mode: 'enhanced' // or strictCompliance: false
+});
+
+// Mode 2: Compliant - Direct YouTube iframe pointer pass-through
+const compliantPlayer = createPlayer({
+  element: '#player-compliant',
+  videoId: 'dQw4w9WgXcQ',
+  mode: 'compliant' // or strictCompliance: true
+});
+```
+
+### Mode Comparison
+
+| Feature | `enhanced` (Default) | `compliant` (Strict Policy) |
+|---|---|---|
+| **Screen Tap to Play/Pause** | Active anywhere on video container | Direct iframe pass-through |
+| **Double-Click Fullscreen** | Active on player canvas | Native YouTube fullscreen |
+| **Smart Ad Passthrough** | Automatic unlock when ads stream (`is-ad-active`) | Native YouTube ad interaction |
+| **Distraction-Free Surface** | Blocks external click leaks & unwanted menus | Direct access to native annotations/cards |
+| **Web Component Syntax** | `<custom-video-player mode="enhanced">` | `<custom-video-player mode="compliant">` |
+| **Runtime Mode Switch** | `player.setMode('compliant')` | `player.setMode('enhanced')` |
 
 ---
 

@@ -61,6 +61,9 @@ export class Player {
     this._currentVideoId = detection.type === 'youtube' ? detection.target : null;
     this._initialStartTime = detection.startTime;
 
+    // Dual-Mode interaction model: 'enhanced' (default) vs 'compliant' (strict YouTube policies)
+    this._mode = this._options.mode || (this._options.strictCompliance ? 'compliant' : 'enhanced');
+
     // Subsystems
     this.events = new EventEmitter();
     this.state = new StateManager(this.events, {
@@ -427,7 +430,7 @@ export class Player {
     const detection = detectSource(videoIdentifier, this._options);
 
     // If provider backend changed (e.g. from youtube to html5 or vice-versa)
-    if (detection.type !== this._providerType && this._isMounted) {
+    if (detection.type !== this._providerType) {
       if (this.provider) {
         this.provider.destroy();
       }
@@ -442,12 +445,20 @@ export class Player {
         this._ui.updateVideoTarget(detection);
       }
 
-      const mountContainer = this._ui ? (this._ui.mediaWrapper || this._ui.iframeWrapper) : this._container;
-      await this.provider.init(mountContainer, detection.target, {
-        autoplay: true,
-        startTime: startSeconds || detection.startTime,
-        ...this._options
-      });
+      if (this._isMounted) {
+        const mountContainer = this._ui ? (this._ui.mediaWrapper || this._ui.iframeWrapper) : this._container;
+        this._mountPromise = this.provider.init(mountContainer, detection.target, {
+          autoplay: true,
+          startTime: startSeconds || detection.startTime,
+          ...this._options
+        });
+        await this._mountPromise;
+      } else {
+        await this.mount();
+        if (startSeconds > 0) {
+          this.seekTo(startSeconds);
+        }
+      }
       return;
     }
 
@@ -473,6 +484,48 @@ export class Player {
    * Toggles floating mini-player mode.
    * @returns {boolean}
    */
+  /**
+   * Returns current interaction mode ('enhanced' | 'compliant').
+   * @returns {'enhanced' | 'compliant'}
+   */
+  get mode() {
+    return this._mode;
+  }
+
+  /**
+   * Sets interaction mode dynamically.
+   * @param {'enhanced' | 'compliant'} newMode
+   */
+  setMode(newMode) {
+    if (newMode !== 'compliant' && newMode !== 'enhanced') {
+      return;
+    }
+    if (this._mode !== newMode) {
+      this._mode = newMode;
+      this._options.mode = newMode;
+      if (this._ui) {
+        this._ui.setMode(newMode);
+      }
+      this.events.emit('change:mode', newMode);
+    }
+  }
+
+  /**
+   * Whether strict YouTube compliance mode is active.
+   * @returns {boolean}
+   */
+  isCompliant() {
+    return this._mode === 'compliant';
+  }
+
+  /**
+   * Whether enhanced distraction-free mode is active.
+   * @returns {boolean}
+   */
+  isEnhanced() {
+    return this._mode === 'enhanced';
+  }
+
   toggleMini() {
     if (this._ui) {
       return this._ui.toggleMini();

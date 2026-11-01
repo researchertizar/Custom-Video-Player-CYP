@@ -45,7 +45,16 @@ export class HTML5Provider extends Provider {
    * @returns {Promise<void>}
    */
   async init(container, source, options = {}) {
+    if (this._video) {
+      this.destroy();
+    }
     this._container = container;
+    if (this._container && typeof this._container.querySelectorAll === 'function') {
+      const existing = this._container.querySelectorAll('.cyp-html5-video, video');
+      existing.forEach((el) => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
+    }
     this._source = source;
     this._title = options.title || this._extractTitle(source);
 
