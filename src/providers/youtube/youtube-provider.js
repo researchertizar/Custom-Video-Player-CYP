@@ -18,8 +18,15 @@ export class YouTubeProvider extends Provider {
     this._mountElement = null;
     this._container = null;
     this._lastState = -1;
+    this._videoId = null;
     /** @type {Array<Function>} */
     this._commandQueue = [];
+    /** @type {MutationObserver|null} */
+    this._observer = null;
+    /** @type {Function|null} */
+    this._messageListener = null;
+    /** @type {any} */
+    this._watchdogTimer = null;
   }
 
   /**
@@ -64,12 +71,35 @@ export class YouTubeProvider extends Provider {
     if (this._yt) {
       this.destroy();
     }
+    if (this._observer) {
+      this._observer.disconnect();
+      this._observer = null;
+    }
+    if (this._messageListener && typeof window !== 'undefined') {
+      window.removeEventListener('message', this._messageListener);
+      this._messageListener = null;
+    }
+    if (this._watchdogTimer) {
+      clearTimeout(this._watchdogTimer);
+      this._watchdogTimer = null;
+    }
     this._container = container;
+    this._videoId = videoId;
     if (this._container && typeof this._container.querySelectorAll === 'function') {
       const existing = this._container.querySelectorAll('.cyp-iframe-target, iframe');
       existing.forEach((el) => {
         if (el.parentNode) el.parentNode.removeChild(el);
       });
+    }
+        // Ensure HTTP Referer header is preserved for YouTube embeds (prevents YouTube Error 153)
+    if (typeof document !== 'undefined' && document.head) {
+      let metaReferrer = document.querySelector('meta[name="referrer"]');
+      if (!metaReferrer) {
+        metaReferrer = document.createElement('meta');
+        metaReferrer.name = 'referrer';
+        metaReferrer.content = 'strict-origin-when-cross-origin';
+        document.head.appendChild(metaReferrer);
+      }
     }
     await youtubeLoader.load();
 
@@ -93,7 +123,10 @@ export class YouTubeProvider extends Provider {
       // Safely configure origin for postMessage communication
       if (typeof window !== 'undefined' && window.location && window.location.origin) {
         if (window.location.protocol.startsWith('http')) {
-          playerVars.origin = window.location.origin;
+          // Do not pass raw IP addresses (127.0.0.1) as YouTube embed servers reject raw IPs with Error 150
+          if (window.location.hostname !== '127.0.0.1') {
+            playerVars.origin = window.location.origin;
+          }
         }
       }
 
@@ -110,8 +143,78 @@ export class YouTubeProvider extends Provider {
         playerVars.cc_lang_pref = options.captionLanguage;
       }
 
+      const applyIframeAttributes = (iframe) => {
+        if (!iframe || iframe.tagName !== 'IFRAME') return;
+        try {
+          if (!iframe.getAttribute('allow')) {
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+          }
+          if (!iframe.getAttribute('referrerpolicy')) {
+            iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+          }
+          if (!iframe.getAttribute('title')) {
+            iframe.setAttribute('title', 'YouTube video player');
+          }
+        } catch {
+          // ignore DOM security exceptions
+        }
+      };
+
+      if (typeof MutationObserver !== 'undefined' && this._container) {
+        this._observer = new MutationObserver((mutations) => {
+          for (const m of mutations) {
+            for (const node of m.addedNodes) {
+              if (node.tagName === 'IFRAME') {
+                applyIframeAttributes(node);
+              } else if (node.querySelectorAll) {
+                node.querySelectorAll('iframe').forEach(applyIframeAttributes);
+              }
+            }
+          }
+        });
+        this._observer.observe(this._container, { childList: true, subtree: true });
+      }
+
+      if (typeof window !== 'undefined') {
+        this._messageListener = (event) => {
+          if (typeof event.origin === 'string' && (event.origin.includes('youtube.com') || event.origin.includes('youtube-nocookie.com'))) {
+            let data = event.data;
+            if (typeof data === 'string') {
+              try { data = JSON.parse(data); } catch { return; }
+            }
+            if (data && data.info) {
+              const info = data.info;
+              const errCode = info.errorCode || (info.videoData && info.videoData.errorCode);
+              if (errCode) {
+                if (this._watchdogTimer) clearTimeout(this._watchdogTimer);
+                const err = mapYouTubeError(Number(errCode), this._videoId || videoId);
+                this._emitter.emit('error', err);
+                this._emitter.emit('provider:error', err);
+              } else if (info.videoData && info.videoData.isPlayable === false) {
+                if (this._watchdogTimer) clearTimeout(this._watchdogTimer);
+                const err = mapYouTubeError(150, this._videoId || videoId);
+                this._emitter.emit('error', err);
+                this._emitter.emit('provider:error', err);
+              }
+            }
+          }
+        };
+        window.addEventListener('message', this._messageListener);
+      }
+
+      this._watchdogTimer = setTimeout(() => {
+        if (!this._isReady) {
+          const vData = this.getVideoData();
+          if (vData && (vData.errorCode || vData.isPlayable === false)) {
+            const err = mapYouTubeError(vData.errorCode || 150, this._videoId || videoId);
+            this._emitter.emit('error', err);
+            this._emitter.emit('provider:error', err);
+          }
+        }
+      }, 4500);
+
       try {
-        const host = options.host || 'https://www.youtube-nocookie.com';
+        const host = options.host || 'https://www.youtube.com';
         this._yt = new window.YT.Player(this._mountElement, {
           host,
           videoId,
@@ -119,6 +222,20 @@ export class YouTubeProvider extends Provider {
           events: {
             onReady: () => {
               this._isReady = true;
+              if (this._watchdogTimer) {
+                clearTimeout(this._watchdogTimer);
+                this._watchdogTimer = null;
+              }
+              if (this._yt && typeof this._yt.getIframe === 'function') {
+                try {
+                  const iframe = this._yt.getIframe();
+                  if (iframe) {
+                    applyIframeAttributes(iframe);
+                  }
+                } catch {
+                  // Ignore cross-origin iframe inspection errors
+                }
+              }
               this._flushQueue();
               this._loadCaptionsModule();
               this._emitter.emit('provider:ready');
@@ -134,13 +251,15 @@ export class YouTubeProvider extends Provider {
               this._emitter.emit('quality:change', event.data);
             },
             onError: (event) => {
-              const err = mapYouTubeError(event.data);
+              if (this._watchdogTimer) clearTimeout(this._watchdogTimer);
+              const err = mapYouTubeError(event.data, this._videoId || videoId);
               this._emitter.emit('error', err);
               this._emitter.emit('provider:error', err);
             }
           }
         });
       } catch (err) {
+        if (this._watchdogTimer) clearTimeout(this._watchdogTimer);
         reject(new PlayerError(ErrorCode.API_LOAD_FAILED, 'Failed to instantiate YT.Player.', err));
       }
     });
@@ -292,6 +411,17 @@ export class YouTubeProvider extends Provider {
   }
 
   loadVideo(videoId, startSeconds = 0) {
+    this._videoId = videoId;
+    if (this._watchdogTimer) clearTimeout(this._watchdogTimer);
+    this._watchdogTimer = setTimeout(() => {
+      const vData = this.getVideoData();
+      if (vData && (vData.errorCode || vData.isPlayable === false)) {
+        const err = mapYouTubeError(vData.errorCode || 150, this._videoId || videoId);
+        this._emitter.emit('error', err);
+        this._emitter.emit('provider:error', err);
+      }
+    }, 4500);
+
     this._enqueue(() => {
       if (this._yt && typeof this._yt.loadVideoById === 'function') {
         this._yt.loadVideoById({
@@ -453,8 +583,32 @@ export class YouTubeProvider extends Provider {
     });
   }
 
+  supportsPictureInPicture() {
+    return false;
+  }
+
+  supportsCaptions() {
+    return true;
+  }
+
+  supportsQualityLevels() {
+    return true;
+  }
+
   destroy() {
     this._commandQueue = [];
+    if (this._watchdogTimer) {
+      clearTimeout(this._watchdogTimer);
+      this._watchdogTimer = null;
+    }
+    if (this._observer) {
+      this._observer.disconnect();
+      this._observer = null;
+    }
+    if (this._messageListener && typeof window !== 'undefined') {
+      window.removeEventListener('message', this._messageListener);
+      this._messageListener = null;
+    }
     if (this._yt && typeof this._yt.destroy === 'function') {
       try {
         this._yt.destroy();

@@ -215,6 +215,14 @@ export class PlayerUI {
       this.setMode(mode);
     });
 
+    this._player.events.on('provider:ready', () => {
+      this.controls.hideError();
+    });
+
+    this._player.events.on('playing', () => {
+      this.controls.hideError();
+    });
+
     this._player.events.on('change:status', (status) => {
       this._root.setAttribute('data-status', status);
 
@@ -309,7 +317,24 @@ export class PlayerUI {
     });
 
     this._player.events.on('error', (err) => {
-      this.controls.showError(err.message);
+      const isRawIp = typeof window !== 'undefined' && window.location && window.location.hostname === '127.0.0.1';
+      const actions = [];
+      if (isRawIp) {
+        actions.push({
+          text: 'Switch to localhost (Play Here)',
+          onClick: () => {
+            window.location.replace(window.location.href.replace('//127.0.0.1', '//localhost'));
+          }
+        });
+      }
+      if (err.watchUrl) {
+        actions.push({
+          text: 'Watch on YouTube ↗',
+          url: err.watchUrl,
+          variant: isRawIp ? 'secondary' : 'primary'
+        });
+      }
+      this.controls.showError(err.message, actions);
     });
 
     // Fullscreen, Theater, Mini events
@@ -375,12 +400,13 @@ export class PlayerUI {
     });
 
     // Fullscreen change listener
-    document.addEventListener('fullscreenchange', () => {
+    this._onFullscreenChange = () => {
       const isFull = Boolean(document.fullscreenElement === this._root);
       this._player.state.set({ fullscreen: isFull });
       this._root.classList.toggle('is-fullscreen', isFull);
       this.controls.setFullscreenState(isFull);
-    });
+    };
+    document.addEventListener('fullscreenchange', this._onFullscreenChange);
   }
 
   _showControls() {
@@ -503,6 +529,7 @@ export class PlayerUI {
    * @param {{ type: string, target: any }} detection
    */
   updateVideoTarget(detection) {
+    this.controls.hideError();
     if (!this._player._isMounted) {
       this._mountPromise = null;
     }
@@ -627,6 +654,9 @@ export class PlayerUI {
 
   destroy() {
     if (this._hideTimer) clearTimeout(this._hideTimer);
+    if (typeof document !== 'undefined' && this._onFullscreenChange) {
+      document.removeEventListener('fullscreenchange', this._onFullscreenChange);
+    }
     this.timeline.destroy();
     this.controls.destroy();
     this.videoBox.remove();

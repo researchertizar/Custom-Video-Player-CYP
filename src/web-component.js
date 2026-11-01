@@ -12,6 +12,8 @@ import { gesturesPlugin } from './plugins/gestures.js';
 export class CustomYouTubePlayerElement extends HTMLElement {
   static get observedAttributes() {
     return [
+      'mode',
+      'strict-compliance',
       'stream-token',
       'video-id',
       'url',
@@ -89,7 +91,10 @@ export class CustomYouTubePlayerElement extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue || !this.player) return;
 
-    if ((name === 'video-id' || name === 'src' || name === 'url' || name === 'stream-token') && newValue) {
+    if (name === 'mode' || name === 'strict-compliance') {
+      const activeMode = this.getAttribute('mode') || (this.hasAttribute('strict-compliance') ? 'compliant' : 'enhanced');
+      this.player.setMode(activeMode);
+    } else if ((name === 'video-id' || name === 'src' || name === 'url' || name === 'stream-token') && newValue) {
       this.player.load(newValue);
     } else if (name === 'preset' && newValue) {
       this.player.applyPreset(newValue);

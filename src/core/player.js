@@ -7,6 +7,11 @@ import { StateManager, PlaybackStatus } from './state.js';
 import { PluginManager } from './plugin-manager.js';
 import { YouTubeProvider } from '../providers/youtube/youtube-provider.js';
 import { HTML5Provider } from '../providers/html5/html5-provider.js';
+import { ProviderRegistry } from '../providers/provider-registry.js';
+
+// Register standard built-in providers
+ProviderRegistry.register('youtube', YouTubeProvider);
+ProviderRegistry.register('html5', HTML5Provider);
 import { detectSource } from '../utils/source-detector.js';
 import { parseYouTubeUrl } from '../utils/youtube-url.js';
 import { PlayerError, ErrorCode } from './errors.js';
@@ -90,6 +95,20 @@ export class Player {
 
     this._bindProviderEvents();
 
+    // Page Visibility API: conserve CPU/battery when browser tab is inactive
+    if (typeof document !== 'undefined') {
+      this._onVisibilityChange = () => {
+        if (this._isDestroyed) return;
+        if (document.hidden) {
+          this._stopPolling();
+        } else if (this.state && this.state.getField('status') === PlaybackStatus.PLAYING) {
+          this._syncProgress();
+          this._startPolling();
+        }
+      };
+      document.addEventListener('visibilitychange', this._onVisibilityChange);
+    }
+
     // Register initial plugins
     if (Array.isArray(this._options.plugins)) {
       for (const plugin of this._options.plugins) {
@@ -109,11 +128,31 @@ export class Player {
    * @returns {Provider}
    * @private
    */
+  /**
+   * Registers a custom media provider engine (Open/Closed Principle).
+   * @param {string} type
+   * @param {typeof import('../providers/provider.js').Provider} ProviderClass
+   */
+  static registerProvider(type, ProviderClass) {
+    ProviderRegistry.register(type, ProviderClass);
+  }
+
+  registerProvider(type, ProviderClass) {
+    ProviderRegistry.register(type, ProviderClass);
+  }
+
+  /**
+   * Factory method resolving provider instance from ProviderRegistry.
+   * @param {string} type
+   * @returns {import('../providers/provider.js').Provider}
+   * @private
+   */
   _createProvider(type) {
-    if (type === 'html5') {
-      return new HTML5Provider(this.events);
+    const ProviderClass = ProviderRegistry.get(type) || ProviderRegistry.get('youtube');
+    if (!ProviderClass) {
+      throw new Error(`[Player] Unknown provider type: "${type}". Register it with Player.registerProvider().`);
     }
-    return new YouTubeProvider(this.events);
+    return new ProviderClass(this.events);
   }
 
   /**
@@ -811,6 +850,10 @@ export class Player {
   destroy() {
     if (this._isDestroyed) return;
     this._isDestroyed = true;
+
+    if (typeof document !== 'undefined' && this._onVisibilityChange) {
+      document.removeEventListener('visibilitychange', this._onVisibilityChange);
+    }
 
     this._stopPolling();
     this.plugins.destroy();

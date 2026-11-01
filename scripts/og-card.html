@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #101014;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #e4e4e7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrapper {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #16161c 0%, #111116 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 48px 56px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 48px;
+      align-items: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      position: relative;
+    }
+
+    /* Left Column: Brand & Messaging */
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      background: rgba(229, 9, 20, 0.12);
+      border: 1px solid rgba(229, 9, 20, 0.35);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-badge svg {
+      width: 18px;
+      height: 18px;
+      margin-left: 2px;
+      fill: #e50914;
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+    }
+
+    .hero-text {
+      margin: auto 0;
+    }
+
+    .hero-h1 {
+      font-size: 42px;
+      font-weight: 750;
+      line-height: 1.18;
+      letter-spacing: -1.2px;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .hero-h1 span {
+      color: #ef4444;
+    }
+
+    .hero-p {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-pill {
+      font-size: 12px;
+      font-weight: 500;
+      color: #d1d5db;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+
+    .cli-bar {
+      background: #0d0d10;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+    }
+
+    .cli-text {
+      color: #e4e4e7;
+    }
+
+    .cli-prompt {
+      color: #ef4444;
+      margin-right: 8px;
+      font-weight: 600;
+    }
+
+    .version-meta {
+      color: #71717a;
+      font-size: 12px;
+    }
+
+    /* Right Column: Sleek Player UI Mockup */
+    .player-window {
+      background: #0d0d11;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 16 / 9.8;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Video Screen Viewport */
+    .screen-area {
+      flex: 1;
+      background: radial-gradient(circle at center, #1c1c24 0%, #0d0d11 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .center-play {
+      width: 58px;
+      height: 58px;
+      background: rgba(229, 9, 20, 0.9);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
+    }
+
+    .center-play svg {
+      width: 24px;
+      height: 24px;
+      margin-left: 3px;
+      fill: #ffffff;
+    }
+
+    .badge-live {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      backdrop-filter: blur(8px);
+    }
+
+    .badge-preset {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      font-size: 11px;
+      font-family: ui-monospace, monospace;
+      color: #9ca3af;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Player Bottom Controls */
+    .controls-dock {
+      background: rgba(14, 14, 18, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Timeline Bar */
+    .timeline-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timeline-fill {
+      width: 38%;
+      height: 100%;
+      background: #e50914;
+      border-radius: 2px;
+    }
+
+    .timeline-buffer {
+      position: absolute;
+      left: 38%;
+      width: 24%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Buttons Row */
+    .buttons-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .controls-left, .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-btn {
+      color: #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .time-readout {
+      font-size: 11px;
+      font-family: ui-monospace, monospace;
+      color: #a1a1aa;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .cc-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: #ffffff;
+      background: #e50914;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Left Column: Typography & Brand -->
+    <div class="left-col">
+      <div class="brand-header">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24">
+            <polygon points="6 4 19 12 6 20 6 4"></polygon>
+          </svg>
+        </div>
+        <span class="brand-title">Custom Video Player</span>
+      </div>
+
+      <div class="hero-text">
+        <h1 class="hero-h1">
+          Universal media player for <span>HTML5</span> &amp; <span>YouTube</span>
+        </h1>
+        <p class="hero-p">
+          Zero-dependency video engine and Autonomous Web Component with S.O.L.I.D. provider architecture, link shielding, and WCAG 2.2 AAA accessibility.
+        </p>
+        <div class="tags-row">
+          <span class="tag-pill">Zero Runtime Dependencies</span>
+          <span class="tag-pill">Pluggable ProviderRegistry</span>
+          <span class="tag-pill">6 UI Presets</span>
+          <span class="tag-pill">TypeScript</span>
+        </div>
+      </div>
+
+      <div class="cli-bar">
+        <div class="cli-text">
+          <span class="cli-prompt">$</span>npm install @researcher-tizar/cyp-player
+        </div>
+        <span class="version-meta">v0.1.1 &bull; MIT</span>
+      </div>
+    </div>
+
+    <!-- Right Column: Actual Clean Player Mockup -->
+    <div class="player-window">
+      <div class="screen-area">
+        <div class="badge-live">Universal Engine</div>
+        <div class="badge-preset">preset: "glass"</div>
+        <div class="center-play">
+          <svg viewBox="0 0 24 24">
+            <polygon points="6 4 19 12 6 20 6 4"></polygon>
+          </svg>
+        </div>
+      </div>
+
+      <div class="controls-dock">
+        <div class="timeline-track">
+          <div class="timeline-fill"></div>
+          <div class="timeline-buffer"></div>
+        </div>
+
+        <div class="buttons-row">
+          <div class="controls-left">
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+            </div>
+            <span class="time-readout">01:24 / 03:45</span>
+          </div>
+
+          <div class="controls-right">
+            <span class="cc-badge">CC</span>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

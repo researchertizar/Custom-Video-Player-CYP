@@ -132,4 +132,79 @@ describe('Controls UI, Progressive Disclosure & Hierarchical Settings', () => {
       expect(svg.trim().startsWith('<svg') || svg.trim().startsWith('<span'), `Icon ${name} should be valid SVG or markup`).toBe(true);
     }
   });
+it('unregisters document click and keydown listeners upon destroy without leaking', () => {
+    const player = createMockPlayer();
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+    const controls = new Controls(player);
+
+    expect(typeof controls._onDocClick).toBe('function');
+    expect(typeof controls._onDocKeyDown).toBe('function');
+
+    controls.destroy();
+
+    expect(removeSpy).toHaveBeenCalledWith('click', controls._onDocClick);
+    expect(removeSpy).toHaveBeenCalledWith('keydown', controls._onDocKeyDown);
+    removeSpy.mockRestore();
+  });
+
+  it('provides hideError to dismiss error overlay cleanly', () => {
+    const player = createMockPlayer();
+    const controls = new Controls(player);
+
+    controls.showError('Test playback error');
+    expect(controls.errorOverlay.classList.contains('is-visible')).toBe(true);
+
+    controls.hideError();
+    expect(controls.errorOverlay.classList.contains('is-visible')).toBe(false);
+  });
+
+  it('renders actionable external link button in error overlay when provided', () => {
+    const player = createMockPlayer();
+    const controls = new Controls(player);
+
+    controls.showError('Embedding disabled', {
+      text: 'Watch on YouTube ↗',
+      url: 'https://www.youtube.com/watch?v=baB7VymlPw0'
+    });
+
+    expect(controls.errorOverlay.classList.contains('is-visible')).toBe(true);
+    expect(controls._errorActionBtn).toBeDefined();
+    expect(controls._errorActionBtn.tagName).toBe('A');
+    expect(controls._errorActionBtn.href).toBe('https://www.youtube.com/watch?v=baB7VymlPw0');
+    expect(controls._errorActionBtn.textContent).toBe('Watch on YouTube ↗');
+
+    controls.hideError();
+    expect(controls._errorActionBtn).toBeNull();
+  });
+
+  it('renders multiple actionable buttons in error overlay when array provided', () => {
+    const player = createMockPlayer();
+    const controls = new Controls(player);
+
+    let clicked = false;
+    controls.showError('IP Restricted', [
+      {
+        text: 'Switch to localhost (Play Here)',
+        onClick: () => { clicked = true; }
+      },
+      {
+        text: 'Watch on YouTube ↗',
+        url: 'https://www.youtube.com/watch?v=baB7VymlPw0',
+        variant: 'secondary'
+      }
+    ]);
+
+    expect(controls.errorOverlay.classList.contains('is-visible')).toBe(true);
+    const actionBtns = controls.errorOverlay.querySelectorAll('.cyp-error-action-btn');
+    expect(actionBtns.length).toBe(2);
+    expect(actionBtns[0].textContent).toBe('Switch to localhost (Play Here)');
+    expect(actionBtns[1].textContent).toBe('Watch on YouTube ↗');
+    expect(actionBtns[1].classList.contains('cyp-error-action-secondary')).toBe(true);
+
+    actionBtns[0].click();
+    expect(clicked).toBe(true);
+
+    controls.hideError();
+    expect(controls.errorOverlay.classList.contains('is-visible')).toBe(false);
+  });
 });

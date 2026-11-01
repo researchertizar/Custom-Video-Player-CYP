@@ -31,9 +31,10 @@ export class PlayerError extends Error {
 /**
  * Maps YouTube API error numeric codes (2, 5, 100, 101, 150) to PlayerError.
  * @param {number} code
+ * @param {string} [videoId]
  * @returns {PlayerError}
  */
-export function mapYouTubeError(code) {
+export function mapYouTubeError(code, videoId = null) {
   switch (code) {
     case 2:
       return new PlayerError(ErrorCode.INVALID_VIDEO_ID, 'The requested video ID is invalid or malformed.', code);
@@ -42,8 +43,18 @@ export function mapYouTubeError(code) {
     case 100:
       return new PlayerError(ErrorCode.VIDEO_UNAVAILABLE, 'The video was removed, made private, or is unavailable.', code);
     case 101:
-    case 150:
-      return new PlayerError(ErrorCode.EMBEDDING_DISABLED, 'The video owner does not allow embedding this video.', code);
+    case 150: {
+      const isRawIp = typeof window !== 'undefined' && window.location && window.location.hostname === '127.0.0.1';
+      const msg = isRawIp
+        ? 'YouTube restricts embedding on raw IP addresses (127.0.0.1). Switch to localhost to play, or watch directly on YouTube.'
+        : 'The video owner does not allow embedding this video outside of YouTube.';
+      const err = new PlayerError(ErrorCode.EMBEDDING_DISABLED, msg, code);
+      if (videoId) {
+        err.watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      }
+      err.isRawIp = isRawIp;
+      return err;
+    }
     default:
       return new PlayerError(ErrorCode.UNKNOWN, `An unexpected playback error occurred (Code: ${code}).`, code);
   }

@@ -83,6 +83,12 @@ export interface PlayerOptions {
 export class Player {
   constructor(options: PlayerOptions);
 
+  /** Registers a custom media provider class statically */
+  static registerProvider(type: string, ProviderClass: typeof Provider): void;
+
+  /** Registers a custom media provider class for this instance */
+  registerProvider(type: string, ProviderClass: typeof Provider): void;
+
   /** Mounts underlying video player */
   /** Interaction mode ('enhanced' | 'compliant') */
   readonly mode: 'enhanced' | 'compliant';
@@ -241,8 +247,40 @@ export class Provider {
   getPlaybackRate(): number;
   loadVideo(source: any, startSeconds?: number): void;
   getVideoData(): { title: string; author: string; videoId: string };
+  supportsPictureInPicture(): boolean;
+  supportsCaptions(): boolean;
+  supportsQualityLevels(): boolean;
   destroy(): void;
 }
+
+export class ProviderRegistry {
+  static register(type: string, ProviderClass: typeof Provider): void;
+  static get(type: string): typeof Provider | undefined;
+  static has(type: string): boolean;
+  static getSupportedTypes(): string[];
+  static reset(): void;
+}
+
+export const ErrorCode: {
+  API_LOAD_FAILED: string;
+  API_TIMEOUT: string;
+  INVALID_VIDEO_ID: string;
+  VIDEO_UNAVAILABLE: string;
+  EMBEDDING_DISABLED: string;
+  HTML5_ERROR: string;
+  PLAYER_NOT_READY: string;
+  PLAYER_DESTROYED: string;
+  UNKNOWN: string;
+};
+
+export class PlayerError extends Error {
+  code: string;
+  originalError?: any;
+  watchUrl?: string;
+  constructor(code: string, message: string, originalError?: any);
+}
+
+export function mapYouTubeError(code: number, videoId?: string): PlayerError;
 export class YouTubeProvider extends Provider {}
 export class HTML5Provider extends Provider {}
 
@@ -276,6 +314,10 @@ export const CustomYouTubePlayer: {
   Provider: typeof Provider;
   YouTubeProvider: typeof YouTubeProvider;
   HTML5Provider: typeof HTML5Provider;
+  ProviderRegistry: typeof ProviderRegistry;
+  ErrorCode: typeof ErrorCode;
+  PlayerError: typeof PlayerError;
+  mapYouTubeError: typeof mapYouTubeError;
   detectSource: typeof detectSource;
   PlayerPresets: typeof PlayerPresets;
   resumePlugin: typeof resumePlugin;

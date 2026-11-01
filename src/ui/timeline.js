@@ -104,11 +104,16 @@ export class Timeline {
   }
 
   _handleHoverMove(e) {
-    const pct = this._getPercentageFromEvent(e);
+    const rect = this.track.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const x = clamp(e.clientX - rect.left, 0, rect.width);
+    const pct = x / rect.width;
     const targetSeconds = (this._duration || 0) * pct;
 
     this.tooltip.textContent = formatTime(targetSeconds);
-    this.tooltip.style.left = `${pct * 100}%`;
+    const tooltipWidth = this.tooltip.offsetWidth || 40;
+    const clampedX = clamp(x, tooltipWidth / 2, rect.width - tooltipWidth / 2);
+    this.tooltip.style.left = `${clampedX}px`;
   }
 
   _applyScrub(pct) {

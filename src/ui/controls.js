@@ -371,19 +371,22 @@ export class Controls {
       }
     });
 
-    document.addEventListener('click', (e) => {
+    this._onDocClick = (e) => {
       if (!this.settingsWrapper.contains(e.target)) {
         this.settingsMenu.classList.remove('is-open');
         this.settingsBtn.setAttribute('aria-expanded', 'false');
       }
-    });
+    };
 
-    document.addEventListener('keydown', (e) => {
+    this._onDocKeyDown = (e) => {
       if (e.key === 'Escape' && this.settingsMenu.classList.contains('is-open')) {
         this.settingsMenu.classList.remove('is-open');
         this.settingsBtn.setAttribute('aria-expanded', 'false');
       }
-    });
+    };
+
+    document.addEventListener('click', this._onDocClick);
+    document.addEventListener('keydown', this._onDocKeyDown);
 
     // Submenu navigations from root view
     this.speedNavBtn.addEventListener('click', (e) => {
@@ -546,11 +549,79 @@ export class Controls {
    * Displays the error overlay with specific message.
    * @param {string} message
    */
-  showError(message) {
+  /**
+   * Displays the error overlay with specific message and optional action.
+   * @param {string} message
+   * @param {{ text?: string, url?: string, onClick?: Function }} [action]
+   */
+  showError(message, actionOrActions = null) {
     this.errorMessage.textContent = message;
+    if (this._errorActionContainer && this._errorActionContainer.parentNode) {
+      this._errorActionContainer.parentNode.removeChild(this._errorActionContainer);
+      this._errorActionContainer = null;
+    }
+    const actions = Array.isArray(actionOrActions)
+      ? actionOrActions
+      : (actionOrActions ? [actionOrActions] : []);
+
+    if (actions.length > 0) {
+      this._errorActionContainer = createElement('div', { className: 'cyp-error-actions' });
+      for (const action of actions) {
+        let btn = null;
+        const btnClass = action.variant === 'secondary'
+          ? 'cyp-error-action-btn cyp-error-action-secondary'
+          : 'cyp-error-action-btn';
+
+        if (action.url) {
+          btn = createElement('a', {
+            className: btnClass,
+            textContent: action.text || 'Watch Externally ↗',
+            attributes: {
+              href: action.url,
+              target: '_blank',
+              rel: 'noopener noreferrer'
+            }
+          });
+        } else if (action.onClick) {
+          btn = createElement('button', {
+            className: btnClass,
+            textContent: action.text || 'Retry',
+            attributes: { type: 'button' }
+          });
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            action.onClick();
+          });
+        }
+        if (btn) {
+          if (!this._errorActionBtn) {
+            this._errorActionBtn = btn;
+          }
+          this._errorActionContainer.appendChild(btn);
+        }
+      }
+      this.errorOverlay.appendChild(this._errorActionContainer);
+    }
     this.errorOverlay.classList.add('is-visible');
     this.loader.classList.add('is-hidden');
     this.centerPlayBtn.classList.add('is-hidden');
+  }
+
+  /**
+   * Hides the error overlay.
+   */
+  hideError() {
+    if (this.errorOverlay) {
+      this.errorOverlay.classList.remove('is-visible');
+    }
+    if (this._errorActionContainer && this._errorActionContainer.parentNode) {
+      this._errorActionContainer.parentNode.removeChild(this._errorActionContainer);
+      this._errorActionContainer = null;
+    }
+    if (this._errorActionBtn && this._errorActionBtn.parentNode) {
+      this._errorActionBtn.parentNode.removeChild(this._errorActionBtn);
+    }
+    this._errorActionBtn = null;
   }
 
   /**
@@ -772,6 +843,10 @@ export class Controls {
 
   destroy() {
     if (this._toastTimer) clearTimeout(this._toastTimer);
+    if (typeof document !== 'undefined') {
+      if (this._onDocClick) document.removeEventListener('click', this._onDocClick);
+      if (this._onDocKeyDown) document.removeEventListener('keydown', this._onDocKeyDown);
+    }
     this.container.remove();
     this.centerPlayBtn.remove();
     this.loader.remove();

@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="cyp-card-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16161c" />
+      <stop offset="100%" stop-color="#111116" />
+    </linearGradient>
+    <radialGradient id="screen-grad" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#1c1c24" />
+      <stop offset="100%" stop-color="#0d0d11" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="630" fill="#101014" />
+
+  <!-- Outer Card Frame -->
+  <g transform="translate(48, 48)">
+    <rect width="1104" height="534" rx="20" fill="url(#cyp-card-bg)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" />
+    <line x1="56" y1="0" x2="156" y2="0" stroke="#e50914" stroke-width="2" />
+
+    <!-- LEFT COLUMN: Brand, Title, Description, Tags, CLI -->
+    <g transform="translate(56, 50)">
+      <!-- Brand Header -->
+      <g transform="translate(0, 0)">
+        <rect width="38" height="38" rx="10" fill="rgba(229, 9, 20, 0.12)" stroke="rgba(229, 9, 20, 0.35)" stroke-width="1" />
+        <polygon points="15,11 27,19 15,27" fill="#e50914" />
+        <text x="50" y="26" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="700" letter-spacing="-0.3">Custom Video Player</text>
+      </g>
+
+      <!-- Main Headline & Description -->
+      <g transform="translate(0, 75)">
+        <text x="0" y="38" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="750" letter-spacing="-1.2">
+          Universal media player for
+        </text>
+        <text x="0" y="84" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="750" letter-spacing="-1.2">
+          <tspan fill="#ef4444">HTML5</tspan> &amp; <tspan fill="#ef4444">YouTube</tspan>
+        </text>
+
+        <text x="0" y="132" fill="#9ca3af" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16.5" font-weight="400">
+          Zero-dependency video engine and Autonomous Web
+        </text>
+        <text x="0" y="158" fill="#9ca3af" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16.5" font-weight="400">
+          Component with S.O.L.I.D. provider architecture, link
+        </text>
+        <text x="0" y="184" fill="#9ca3af" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16.5" font-weight="400">
+          shielding, and WCAG 2.2 AAA accessibility.
+        </text>
+
+        <!-- Feature Pills -->
+        <g transform="translate(0, 215)">
+          <rect width="140" height="28" rx="6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+          <text x="70" y="18" fill="#d1d5db" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="500" text-anchor="middle">0 Dependencies</text>
+
+          <rect x="148" width="138" height="28" rx="6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+          <text x="217" y="18" fill="#d1d5db" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="500" text-anchor="middle">ProviderRegistry</text>
+
+          <rect x="294" width="95" height="28" rx="6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+          <text x="341" y="18" fill="#d1d5db" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="500" text-anchor="middle">6 UI Presets</text>
+
+          <rect x="397" width="95" height="28" rx="6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+          <text x="444" y="18" fill="#d1d5db" font-family="-apple-system, sans-serif" font-size="11.5" font-weight="500" text-anchor="middle">TypeScript</text>
+        </g>
+      </g>
+
+      <!-- Terminal Command Bar -->
+      <g transform="translate(0, 380)">
+        <rect width="490" height="46" rx="10" fill="#0d0d10" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+        <text x="18" y="28" fill="#ef4444" font-family="ui-monospace, monospace" font-size="13" font-weight="700">$</text>
+        <text x="34" y="28" fill="#e4e4e7" font-family="ui-monospace, monospace" font-size="13">npm install @researcher-tizar/cyp-player</text>
+        <text x="472" y="28" fill="#71717a" font-family="-apple-system, sans-serif" font-size="12" text-anchor="end">v0.1.1 &bull; MIT</text>
+      </g>
+    </g>
+
+    <!-- RIGHT COLUMN: Sleek Player Window Mockup -->
+    <g transform="translate(580, 75)">
+      <rect width="468" height="380" rx="14" fill="#0d0d11" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+
+      <!-- Video Screen Area -->
+      <g transform="translate(1, 1)">
+        <rect width="466" height="305" rx="13" fill="url(#screen-grad)" />
+
+        <!-- Screen Overlay Badges -->
+        <rect x="14" y="14" width="112" height="24" rx="6" fill="rgba(0, 0, 0, 0.6)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" />
+        <text x="70" y="30" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" text-anchor="middle">Universal Engine</text>
+
+        <rect x="352" y="14" width="100" height="24" rx="6" fill="rgba(0, 0, 0, 0.6)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+        <text x="402" y="30" fill="#9ca3af" font-family="ui-monospace, monospace" font-size="11" text-anchor="middle">preset: "glass"</text>
+
+        <!-- Center Play Button -->
+        <circle cx="233" cy="152" r="29" fill="rgba(229, 9, 20, 0.9)" />
+        <polygon points="226,140 246,152 226,164" fill="#ffffff" />
+      </g>
+
+      <!-- Bottom Control Bar -->
+      <g transform="translate(0, 306)">
+        <rect width="468" height="74" fill="rgba(14, 14, 18, 0.95)" />
+        <line x1="0" y1="0" x2="468" y2="0" stroke="rgba(255, 255, 255, 0.06)" stroke-width="1" />
+
+        <!-- Timeline Track -->
+        <g transform="translate(18, 12)">
+          <rect width="432" height="4" rx="2" fill="rgba(255, 255, 255, 0.15)" />
+          <rect width="164" height="4" rx="2" fill="#e50914" />
+          <rect x="164" width="104" height="4" fill="rgba(255, 255, 255, 0.25)" />
+        </g>
+
+        <!-- Controls Row -->
+        <g transform="translate(18, 38)">
+          <!-- Left: Play icon, Volume icon, Time readout -->
+          <polygon points="0,2 10,8 0,14" fill="#d1d5db" />
+          <polygon points="24,3 20,6 17,6 17,10 20,10 24,13" fill="#d1d5db" />
+          <path d="M26,5 C28,7 28,9 26,11" stroke="#d1d5db" stroke-width="1.5" fill="none" />
+
+          <rect x="42" y="-2" width="76" height="20" rx="4" fill="rgba(0, 0, 0, 0.5)" />
+          <text x="80" y="12" fill="#a1a1aa" font-family="ui-monospace, monospace" font-size="11" text-anchor="middle">01:24 / 03:45</text>
+
+          <!-- Right: CC badge, Settings, Fullscreen -->
+          <rect x="345" y="-1" width="22" height="18" rx="3" fill="#e50914" />
+          <text x="356" y="12" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="10" font-weight="700" text-anchor="middle">CC</text>
+
+          <circle cx="390" cy="8" r="4.5" stroke="#d1d5db" stroke-width="1.5" fill="none" />
+          <rect x="418" y="2" width="14" height="12" rx="2" stroke="#d1d5db" stroke-width="1.5" fill="none" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

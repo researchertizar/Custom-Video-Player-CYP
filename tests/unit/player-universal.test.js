@@ -176,4 +176,22 @@ describe('Player Universal Support', () => {
     expect(container.querySelectorAll('video').length).toBe(0);
     expect(container.querySelectorAll('.cyp-iframe-target').length).toBe(1);
   });
+it('attaches and removes document visibilitychange listener without leaking', () => {
+    const addSpy = vi.spyOn(document, 'addEventListener');
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+
+    const testPlayer = new Player({
+      element: container,
+      lazy: true
+    });
+
+    expect(typeof testPlayer._onVisibilityChange).toBe('function');
+    expect(addSpy).toHaveBeenCalledWith('visibilitychange', testPlayer._onVisibilityChange);
+
+    testPlayer.destroy();
+    expect(removeSpy).toHaveBeenCalledWith('visibilitychange', testPlayer._onVisibilityChange);
+
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
+  });
 });

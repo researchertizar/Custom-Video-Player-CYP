@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseYouTubeUrl, isValidVideoId, encodeStreamToken, decodeStreamToken } from '../../src/utils/youtube-url.js';
+import { mapYouTubeError, ErrorCode } from '../../src/core/errors.js';
 
 describe('YouTube URL Parser', () => {
   it('validates 11-char video IDs', () => {
@@ -65,6 +66,12 @@ describe('YouTube URL Parser', () => {
     const parsed = decodeStreamToken(token);
     expect(parsed.videoId).toBe('dQw4w9WgXcQ');
     expect(parsed.startTime).toBe(85);
+  });
+
+  it('attaches watchUrl to PlayerError on embedding restriction code 101/150', () => {
+    const err = mapYouTubeError(150, 'baB7VymlPw0');
+    expect(err.code).toBe(ErrorCode.EMBEDDING_DISABLED);
+    expect(err.watchUrl).toBe('https://www.youtube.com/watch?v=baB7VymlPw0');
   });
 });
 

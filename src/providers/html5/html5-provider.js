@@ -64,7 +64,9 @@ export class HTML5Provider extends Provider {
       this._video.playsInline = true;
       this._video.setAttribute('playsinline', '');
       this._video.setAttribute('webkit-playsinline', '');
-      this._video.crossOrigin = options.crossorigin || 'anonymous';
+      if (options.crossorigin) {
+        this._video.crossOrigin = options.crossorigin;
+      }
       this._video.preload = options.preload || 'metadata';
 
       if (options.poster) {
@@ -183,6 +185,7 @@ export class HTML5Provider extends Provider {
       });
 
       addEvt('error', () => {
+        if (!this._video) return;
         const mediaErr = this._video ? this._video.error : null;
         const msg = mediaErr ? `HTML5 Video Error: code ${mediaErr.code} - ${mediaErr.message || 'Playback failed'}` : 'HTML5 Video Playback Error';
         const err = new PlayerError(ErrorCode.EMBED_NOT_ALLOWED, msg);
@@ -415,6 +418,18 @@ export class HTML5Provider extends Provider {
     }
   }
 
+  supportsPictureInPicture() {
+    return Boolean(typeof document !== 'undefined' && (document.pictureInPictureEnabled || this._video?.requestPictureInPicture));
+  }
+
+  supportsCaptions() {
+    return Boolean(this._video && this._video.textTracks && this._video.textTracks.length > 0);
+  }
+
+  supportsQualityLevels() {
+    return false;
+  }
+
   destroy() {
     if (this._video) {
       for (const [evt, handler] of this._boundListeners.entries()) {
@@ -423,10 +438,10 @@ export class HTML5Provider extends Provider {
       this._boundListeners.clear();
       this._video.pause();
       this._video.removeAttribute('src');
-      this._video.load();
       if (this._video.parentNode) {
         this._video.parentNode.removeChild(this._video);
       }
+      this._video = null;
     }
     this._video = null;
     this._isReady = false;

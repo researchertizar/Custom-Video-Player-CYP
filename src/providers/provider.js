@@ -149,6 +149,30 @@ export class Provider {
   }
 
   /**
+   * Indicates if the provider supports Picture-in-Picture.
+   * @returns {boolean}
+   */
+  supportsPictureInPicture() {
+    return false;
+  }
+
+  /**
+   * Indicates if the provider supports caption track switching.
+   * @returns {boolean}
+   */
+  supportsCaptions() {
+    return false;
+  }
+
+  /**
+   * Indicates if the provider supports selectable playback quality levels.
+   * @returns {boolean}
+   */
+  supportsQualityLevels() {
+    return false;
+  }
+
+  /**
    * Tears down provider and cleans up event handlers and references.
    */
   destroy() {
