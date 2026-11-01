@@ -30,4 +30,16 @@ const redirectHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 fs.writeFileSync(path.resolve(demoDir, 'index.html'), redirectHtml, 'utf-8');
+
+// Copy SEO, GEO, and social assets to dist-demo root
+const copyList = ['robots.txt', 'sitemap.xml', 'llms.txt', 'assets'];
+for (const item of copyList) {
+  const src = path.resolve(rootDir, 'demo', item);
+  const dest = path.resolve(distDemo, item);
+  if (fs.existsSync(src)) {
+    fs.cpSync(src, dest, { recursive: true, force: true });
+    console.log(`Copied ${item} to dist-demo/`);
+  }
+}
+
 console.log('Showcase build complete with root index.html and /demo/ fallback.');

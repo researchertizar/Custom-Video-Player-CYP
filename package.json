@@ -28,6 +28,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:demo": "node scripts/build-demo.js",
+    "update:seo": "python scripts/update_seo_metadata.py",
     "test": "vitest run",
     "preview": "vite preview"
   },

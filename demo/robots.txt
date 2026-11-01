@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Direct AI Agents to LLMs context
+Allow: /llms.txt
+Sitemap: https://researchertizar.github.io/Custom-Video-Player-CYP/sitemap.xml

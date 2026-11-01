@@ -1,0 +1,53 @@
+# Custom Video Player (CYP)
+> Universal zero-dependency autonomous Web Component media player for native HTML5 and YouTube.
+
+## Quick Facts
+- Package: @researcher-tizar/cyp-player
+- Version: 0.1.0
+- Bundle Size: ~26.8KB gzip
+- Runtime Dependencies: 0
+- License: MIT
+- Test Suite: 60/60 tests passing (Vitest)
+- Live Showcase: https://researchertizar.github.io/Custom-Video-Player-CYP/
+- Code Repository: https://github.com/researchertizar/Custom-Video-Player-CYP
+
+## Overview
+CYP provides a unified abstraction (`IPlayerProvider`) that normalizes playback between local HTML5 video files (MP4, WebM) and YouTube streams under a single declarative custom element tag: `<custom-video-player>`.
+
+## Key Capabilities
+1. Zero Runtime Dependencies: Pure vanilla JavaScript and native Autonomous Custom Elements (`customElements.define`).
+2. Stream Link Shielding: Neutralizes external YouTube suggestions and embed redirect leakage (`rel=0`, privacy mode).
+3. Token Obfuscation: Protects stream tokens and URLs from basic web scrapers.
+4. Modular UI Presets: 6 built-in themes (Default, Minimal, Cyberpunk, Cinematic, Glassmorphism, Neon).
+5. Hardened Security: Protocol allowlisting against DOM XSS in `setLogo()` and ReDoS depth guards on token substitution.
+
+## Installation
+```bash
+npm install @researcher-tizar/cyp-player
+```
+
+## Declarative Usage
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@researcher-tizar/cyp-player/dist/player.es.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@researcher-tizar/cyp-player/dist/player.css">
+
+<!-- HTML5 Video -->
+<custom-video-player src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" theme="cinematic"></custom-video-player>
+
+<!-- YouTube Stream -->
+<custom-video-player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" theme="cyberpunk"></custom-video-player>
+```
+
+## Programmatic JavaScript API
+```javascript
+import { CustomVideoPlayer } from '@researcher-tizar/cyp-player';
+import '@researcher-tizar/cyp-player/style';
+
+const player = new CustomVideoPlayer({
+  container: '#video-container',
+  src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  theme: 'glassmorphism',
+  autoplay: false,
+  controls: true
+});
+```
